@@ -8,6 +8,7 @@
 \label{sec:beamFVDiscretisation}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The beam domain $s\in[0,L]$ is discretised into non-overlapping one-dimensional control volumes (CVs). Let cell $P$ be bounded by the faces $w$ and $e$, with cell length $L_P$, and let $W$ and $E$ be its neighbours, as in Figure~\ref{fig:beamCV}. The centreline position and the rotation parameters are stored at the CV centres, the spatial resultants $(\mathbf{n},\mathbf{m})$ are evaluated at the faces by linear interpolation of the cell-centred kinematic quantities \citep{bali_cell-centered_2022}, and the external loading is collocated at the cell centre.
 
 \begin{figure}[!ht]
@@ -17,6 +18,7 @@ The beam domain $s\in[0,L]$ is discretised into non-overlapping one-dimensional 
 \label{fig:beamCV}
 \end{figure}
 
+\noindent
 Integrating Eqs.~\eqref{eq:ForceBalanceDynamic}--\eqref{eq:MomentBalanceDynamic} over cell $P$ gives the locally conservative discrete form
 \begin{align}
 \mathbf{n}_{e} - \mathbf{n}_{w} + \mathbf{f}_{P}\,L_{P} &= \rho_{b}A\,L_{P}\,\ddot{\mathbf{w}}_{P}, \label{eq:fvForceBalance} \\
@@ -24,6 +26,7 @@ Integrating Eqs.~\eqref{eq:ForceBalanceDynamic}--\eqref{eq:MomentBalanceDynamic}
 \end{align}
 with the cell-centre source terms already using the midpoint-rule approximation of the volume integral. The face resultants are nonlinear functions of the kinematic unknowns at cells $P$, $W$, and $E$ through Eqs.~\eqref{eq:GammaKDef} and~\eqref{eq:CNCM}.
 
+\noindent
 The unknowns at each CV centre are organised as the six-component increment $\boldsymbol{\phi}_P = (\Delta\mathbf{w}_P,\,\Delta\boldsymbol{\psi}_P)^{T}$ between successive Newton iterates, so the translational and rotational rows are solved simultaneously. Linearising about the current iterate gives the three-point finite volume form
 \begin{equation}
 \mathbf{A}_{W}\,\boldsymbol{\phi}_{W} \;+\; \mathbf{A}_{P}\,\boldsymbol{\phi}_{P} \;+\; \mathbf{A}_{E}\,\boldsymbol{\phi}_{E} \;=\; \mathbf{b}_{P},
@@ -31,6 +34,7 @@ The unknowns at each CV centre are organised as the six-component increment $\bo
 \end{equation}
 in which the coefficients are dense $6\times 6$ blocks mixing the translation and rotation rows and $\mathbf{b}_{P}$ is the residual of cell $P$. Assembling over all CVs yields a sparse block-tridiagonal system of size $6N_b\times 6N_b$, where $N_b$ is the number of beam cells. The dense off-diagonal blocks arise because the translational and rotational unknowns are tightly coupled by the moment-balance cross-product $\mathbf{r}'\times\mathbf{n}$, so a partitioned solve that updated translations and rotations in turn would lose this coupling and converge poorly in the large-rotation regime.
 
+\noindent
 The system is solved by a Newton--Raphson iteration. Stacking the per-CV residuals gives $\mathbf{K}^{(k)}\boldsymbol{\phi}^{(k)} = -\mathbf{R}(\mathbf{w}^{(k)},\boldsymbol{\Lambda}^{(k)})$ with $\mathbf{K}^{(k)}$ the global tangent matrix, and the kinematic fields are then updated cell by cell,
 \begin{equation}
 \mathbf{w}^{(k+1)} \;=\; \mathbf{w}^{(k)} + \Delta\mathbf{w}^{(k)},
@@ -40,6 +44,7 @@ The system is solved by a Newton--Raphson iteration. Stacking the per-CV residua
 \end{equation}
 The iteration continues until both the increment norm $\max(\|\Delta\mathbf{w}^{(k)}\|,\|\Delta\boldsymbol{\psi}^{(k)}\|)$ and the residual norm fall below prescribed tolerances, the two being monitored separately because one component can converge several orders of magnitude faster than the other in the large-rotation regime.
 
+\noindent
 Two time-integration schemes are available for the acceleration terms. All transient results reported here use the first-order backward scheme,
 \begin{equation}
 \ddot{\mathbf{w}}^{\,n} \;=\; \frac{\mathbf{w}^{\,n} - 2\mathbf{w}^{\,n-1} + \mathbf{w}^{\,n-2}}{\Delta t^{2}},
@@ -52,8 +57,10 @@ with the analogous construction for $\dot{\boldsymbol{\Omega}}$, and a Newmark s
 \label{sec:almCouplingTheory}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The beam centreline carries a set of \emph{actuator points} $\mathbf{P}_{a,i}$, one per beam control volume, at which the kinematic state of the beam is sampled and the hydrodynamic interaction is concentrated. Each actuator point follows the beam-cell centre as the structure deforms, the surrounding Eulerian mesh remains stationary, and the hydrodynamic exchange is realised through the volumetric source $\mathbf{S}_{m}$ of Eq.~\eqref{eq:momentum}. The strategy follows the centreline-forcing approach of \citet{bral_development_2025,bral_modeling_2025}, and extends it in two ways. The structural side is the cell-centred finite volume beam of Section~\ref{sec:beamFVDiscretisation} rather than a finite element discretisation, so the beam unknowns reside on the same data structures as the fluid unknowns and are updated within the same outer time loop, and the sampling and projection operators are implemented in a parallel-consistent form that scales to domain-decomposed fluid meshes (Section~\ref{sec:almParallelSearch}).
 
+\noindent
 Two transfer operations are needed at each time step. The first samples the local fluid velocity near each actuator point and uses it to evaluate the hydrodynamic line force on the beam. The second projects the equal and opposite reaction back onto the fluid mesh as a regularised volumetric source. They are treated differently by design. Velocity sampling is confined to a single fluid cell per beam cell to avoid contamination from the modified flow induced by the source itself, whereas force projection is smoothed over neighbouring cells through a Gaussian kernel, because a singular line force cannot be imposed on a finite volume discretisation without severe grid dependence.
 
 \subsubsection{Centreline coupling conditions}
@@ -71,8 +78,10 @@ where $\mathbf{P}_{a,i}^{\,0}$ is the initial position, $\mathbf{W}_{i}$ the tra
 \end{equation}
 with $L_{i}$ the beam-cell length and $V_{j}$ the volume of fluid cell $j$.
 
+\noindent
 Equation~\eqref{eq:almActionReaction} is a statement about the transferred load alone, and not a momentum balance over a region of material. Each subsystem carries its own inertia in its own momentum equation, and those terms are untouched by the exchange, so the relation plays the same role as the equality of tractions across a resolved interface in body-fitted FSI, where the interface itself carries no mass. For the \emph{resultant} force the exchange is conservative, because the normalisation of Section~\ref{sec:almProjection} rescales the projected source so that its discrete volume integral matches the force carried by the actuator segments to round-off. What remains approximate is the spatial distribution. The kernel spreads the reaction over a finite region rather than along the centreline, so the moment of the applied source about a given point differs from that of the line load by an amount that scales with the kernel width, and the angular-momentum transfer differs with it.
 
+\noindent
 Figure~\ref{fig:almCouplingSchematic} summarises the information exchange between the three components.
 
 \begin{figure}[!ht]
@@ -143,6 +152,7 @@ The actuator-point position is reconstructed from three quantities stored on the
 \end{equation}
 where $\mathbf{C}^{b}_{i}$ is the initial beam-cell centre, $\mathbf{W}^{\mathrm{ref}}_{i}$ a fixed offset that places the actuator point at a chosen material location relative to the cell centre (typically zero, but retained so the point can be shifted onto, for example, the upper surface of a non-axisymmetric cross-section), and $\mathbf{W}_{i}$ the current displacement. The actuator-point velocity is the time derivative of Eq.~\eqref{eq:almActuatorPoint} and equals the beam-cell translational velocity, because the first two terms are time-independent. The local tangent $\mathbf{e}_{t,i}$ is reconstructed from a Hermite spline through the current beam-cell centres, and is needed both to decompose the relative velocity and to define the upstream sampling direction.
 
+\noindent
 The sampling point is placed at a fixed distance upstream of the actuator point, in a direction reconstructed locally from the incoming flow. A preliminary relative velocity is first evaluated at the actuator point itself,
 \begin{equation}
 \mathbf{u}^{0}_{r,i}
@@ -163,6 +173,7 @@ where $\mathbf{U}_{c(\mathbf{P}_{a,i})}$ is the velocity stored in the single fl
 \end{equation}
 where $\ell_{s}$ is the sampling distance and $\mathbf{n}_{p}$ a prescribed plane normal used to flatten the stencil onto a chosen plane in three-dimensional simulations. When $\lVert\mathbf{u}^{0}_{n,i}\rVert$ falls below a small threshold, for example because the beam is nearly aligned with the flow or the flow has stagnated, the unit vector becomes ill-conditioned and the implementation switches to a fallback direction, namely the user-prescribed global upstream direction projected onto the local cross-section plane and renormalised. Because the projector in Eq.~\eqref{eq:almSamplingPoint} removes the component of $\mathbf{e}_{s,i}$ along $\mathbf{n}_{p}$ without renormalising, the realised offset is bounded above by $\ell_{s}$ and equals it only when $\mathbf{e}_{s,i}$ already lies in the sampling plane, which holds in every configuration studied here. The distance itself is set as $\ell_{s} = r_{s}^{\star}L_{\mathrm{ref}}$, with $L_{\mathrm{ref}}$ the beam radius for circular cross-sections and a representative cross-section dimension otherwise, so its dimensional value is problem-dependent rather than universal. Its influence on the response is examined directly in Section~\ref{sec:beamtunnel_sensitivity}.
 
+\noindent
 Once the sampling point has been located, the fluid cell containing it is found by the same operator, and the velocity stored in that single cell defines the relative velocity used by the line-force model,
 \begin{equation}
 \mathbf{U}_{r,i}
@@ -230,6 +241,7 @@ where $\varepsilon$ is the regularisation width, whose influence is examined in 
 \label{fig:almProjectionSchematic}
 \end{figure}
 
+\noindent
 The projected force is normalised so that the volume integral of the applied source is consistent with the force carried by the beam segment. For beam point $k$ the weight is accumulated as $w_k = \sum_{j}\omega_{jk}\eta_{\varepsilon}(r_j)V_j$, where $V_j$ is the fluid-cell volume and $\omega_{jk}$ the linear interpolation weight, with $\omega_{ji}=1-s_j$ and $\omega_{j,i+1}=s_j$. The normalised nodal force is $\widehat{\mathbf{f}}_k = \mathbf{f}_k\Delta s_k / w_k$, with $\Delta s_k$ the local actuator-segment length, and the source applied to a fluid cell is
 \begin{equation}
 \mathbf{S}_{m,j}^{(i)}
@@ -244,6 +256,7 @@ s_j\widehat{\mathbf{f}}_{i+1}
 \end{equation}
 the negative sign indicating that the source is the reaction applied to the fluid. It is integrated over the receiving cell with the cell-centred midpoint rule, consistent with the second-order accuracy of the surrounding finite volume operators.
 
+\noindent
 This normalisation makes the resultant of the applied source exact by construction. Summing Eq.~\eqref{eq:almMomentumSource} over all fluid cells and regrouping by beam point gives $\sum_{j}\mathbf{S}_{m,j}V_{j} = -\sum_{k}\widehat{\mathbf{f}}_{k}\,w_{k} = -\sum_{k}\mathbf{f}_{k}\,\Delta s_{k}$, so the total force applied to the fluid equals the total actuator-line load to round-off, whatever the mesh, kernel width, or kernel truncation, provided every accumulated weight is non-zero. That condition holds whenever at least one fluid cell is assigned to each actuator segment. The same guarantee does not extend to angular momentum, since the kernel redistributes the force away from the centreline.
 
 \subsubsection{Coupled update sequence and parallel-consistent search}
@@ -266,12 +279,17 @@ Algorithm~\ref{alg:almCoupling} summarises the operations performed at every tim
 \end{algorithmic}
 \end{algorithm}
 
+\noindent
 The line force is evaluated once per time step, before the structural Newton loop, and held fixed for the remainder of the step. This choice is deliberate. The sampling point moves with the beam, so a large enough change in displacement between Newton iterations can carry that point across a fluid cell boundary. The sampled velocity then jumps between two neighbouring cells, the force jumps with it, and the iteration oscillates between two states instead of converging. Freezing the force removes that failure mode, at the cost of making the coupling explicitly staggered, with the interface load lagging the fluid solution by one time step. The empirical size of that lag is bounded in Section~\ref{sec:beamtunnel_sensitivity}, where driving the pressure--velocity system to convergence within the step, rather than taking a single outer iteration, changes the steady tip displacement by $0.1\%$.
 
+\noindent
 The two cell searches in steps~2 and~4 govern the parallel behaviour of the update. Searching the entire fluid mesh for each query point would cost $\mathcal{O}(N_{b}N_{c})$ point-in-cell tests per time step, which is prohibitive on the meshes used in Section~\ref{sec:flexveg}. The cost is reduced in two complementary ways. The actuator points of adjacent beam cells lie within a beam-cell length of each other, typically much smaller than the local fluid cell size, so their containing cells are either identical or face neighbours. The implementation therefore stores a seed cell for each beam cell, taken from the previously processed one, and walks from that seed across face neighbours toward the query point until either the containing cell is found or the walk exits the local subdomain, which terminates in $\mathcal{O}(1)$ face traversals in the steady-state limit. A failed walk falls back to a single global search on the local subdomain, so the only $\mathcal{O}(N_{c})$ search per time step is the cold start on the first beam cell of each rank.
 
+\noindent
 On a domain-decomposed fluid mesh, each rank holds only a subset of the fluid cells, so a query point strictly interior to one subdomain has its containing cell on exactly one rank. The per-beam-cell sampled velocity field can therefore be assembled across ranks by a single reduction with summation without double-counting, after a cheap bounding-box test rejects beam cells lying outside the local subdomain before any face walk is attempted. The sampling-point construction of step~3 requires the global preliminary relative velocity, so it is performed on the master rank and the resulting points are broadcast, after which each rank runs the same seeded search over its own subdomain. Two degenerate cases are possible. A query point lying exactly on a processor interface is resolved by the tolerance of the containment test, and no double-counting was observed in any simulation reported here. A point found by no rank, which can happen only if it leaves the fluid domain, contributes zero to the reduction, so the affected beam cell would silently carry no load for that step; the case set-ups reported here keep all actuator and sampling points inside the fluid domain by construction.
 
+\noindent
 The combined cost of the two searches is $\mathcal{O}(N_{b})$ per time step in the steady state, and the two reduction-broadcast pairs are the only collective communication the coupling requires, so the operator scales with the underlying fluid solver. The projection of step~7 carries a separate cost that this estimate does not include, namely a direct sweep of $\mathcal{O}(N_{c}N_{b}/N_{\mathrm{rank}})$ distance evaluations per rank per time step. Because the beam discretisations used here are small ($N_{b} = \mathcal{O}(10^{2})$) and the sweep runs over local cells only, with no communication, this remains a modest fraction of a pressure--velocity solve, but it grows linearly with $N_{b}$ and would require an acceleration structure over the actuator segments for beams discretised into many more cells.
 
+\noindent
 All components are implemented in a single OpenFOAM-based library that the standard solvers load at run time, with the beam solver and the coupling operator selected through case dictionaries and no source code modified per case. The two channel-flow benchmarks run on \texttt{pimpleFoam} and the two-phase wave-flume case on \texttt{interFoam}, with the coupling implementation identical in both, so moving between single-phase and two-phase flow changes only the solver executable and the case dictionaries. All simulations are run in parallel using domain decomposition of the fluid mesh, with a separate decomposition of the one-dimensional beam mesh.

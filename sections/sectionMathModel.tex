@@ -3,6 +3,7 @@
 \label{sec:mathmodel}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The coupled problem consists of a slender flexible structure, represented by a geometrically exact beam, embedded inside an incompressible flow domain. There is no body-fitted mesh around the structure. The beam exchanges momentum with the flow through a distributed volumetric source, and the surrounding Eulerian fluid mesh remains stationary throughout. Boldface symbols denote vector or, where stated, second-order tensor quantities.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -10,6 +11,7 @@ The coupled problem consists of a slender flexible structure, represented by a g
 \label{sec:fluidSubsystem}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The fluid is modelled as an incompressible Newtonian flow governed by
 \begin{equation}
 \nabla \cdot \mathbf{U} = 0,
@@ -26,6 +28,7 @@ The fluid is modelled as an incompressible Newtonian flow governed by
 \end{equation}
 where $\mathbf{U}$ is the velocity, $\rho$ the density, $\mu$ the dynamic viscosity, $p$ the pressure, and $\mathbf{g}$ the gravitational acceleration. The term $\mathbf{S}_{m}$ is the volumetric momentum source through which the beam acts on the flow, derived in Section~\ref{sec:almProjection}. The coupled pressure--velocity system is solved with the standard segregated PIMPLE procedure of OpenFOAM.
 
+\noindent
 The coupling operator is formulated independently of the number of fluid phases. The channel-flow benchmarks of Sections~\ref{sec:beamtunnel} and~\ref{sec:leaflet} are single-phase and the wave-flume validation of Section~\ref{sec:flexveg} is two-phase, with the same implementation used unchanged in both. For the two-phase case a volume-of-fluid formulation transports a phase fraction $\alpha$ to distinguish the two immiscible fluids, the system is treated as a single mixture with phase-averaged properties $\rho = \alpha \rho_1 + (1-\alpha)\rho_2$ and $\mu = \alpha \mu_1 + (1-\alpha)\mu_2$, and the phase fraction is advanced by
 \begin{equation}
 \frac{\partial \alpha}{\partial t}
@@ -50,6 +53,7 @@ u(z,\theta) = \frac{H\omega}{2}\,\frac{\cosh kz}{\sinh kd}\,\cos\theta
 \end{equation}
 with $\theta = kx - \omega t$ the wave phase. The second harmonic sharpens the crests, flattens the troughs, and makes the crest-phase velocity larger in magnitude but shorter in duration than the trough-phase velocity. This asymmetry matters for drag-driven structures, because a quadratic drag force rectifies it into a net forcing asymmetry over the cycle. The adequacy of a given order is judged by the steepness together with the Ursell number $\mathrm{Ur} = H\lambda^2/d^3$, second-order theory being adequate for $\mathrm{Ur} \lesssim 10$ \citep{dean_water_1991}. Where the simulated conditions approach $\mathrm{Ur} \approx 20$, the fifth-order theory of \citet{fenton_fifth_1985} is used instead.
 
+\noindent
 The chosen theory is imposed at the inlet as time-dependent boundary values of velocity and phase fraction, ramped smoothly from rest, combined with active absorption that cancels waves reflected back toward the inlet \citep{higuera_realistic_2013}. At the outlet, a shallow-water absorption condition removes the outgoing wave using the linear long-wave celerity $\sqrt{gd}$. Because that celerity is exact only in the long-wave limit, the outlet absorption degrades as the relative depth $kd$ approaches unity, which is relevant to one of the validation conditions of Section~\ref{sec:flexveg}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -57,10 +61,13 @@ The chosen theory is imposed at the inlet as time-dependent boundary values of v
 \label{sec:beamSection}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The structure is modelled as a one-dimensional \emph{Simo--Reissner} beam whose centreline can undergo arbitrarily large three-dimensional translations and rotations without any small-rotation linearisation. The equilibrium equations are written in the deformed configuration and rotations are treated through the full nonlinear theory of finite rotations. The formulation retains shear deformation and torsion in addition to bending and axial stretch, and the cell-centred finite volume discretisation along the one-dimensional beam domain \citep{bali_cell-centered_2022} keeps the structural and fluid sides of the coupling on the same data infrastructure.
 
+\noindent
 A \emph{total Lagrangian} description is adopted, in which every kinematic quantity is referred back to the fixed reference configuration through the arc-length coordinate $s \in [0,L]$. The initial stress-free centreline is $\mathbf{r}_0(s)$ and the current deformed centreline $\mathbf{r}(s,t)$, and the orientation of the cross-section at each $s$ is represented by a rotation tensor $\boldsymbol{\Lambda}(s,t) \in SO(3)$. Finite rotations are parameterised through a rotation vector $\boldsymbol{\psi}\in\mathbb{R}^3$ whose direction is the axis and whose magnitude is the angle, related to the tensor by the exponential map $\boldsymbol{\Lambda}(\boldsymbol{\psi}) = \exp(\widehat{\boldsymbol{\psi}})$, written in closed form by Rodrigues' formula \citep{dai_eulerrodrigues_2015}, with $\widehat{(\cdot)}$ the skew-symmetric matrix representing the cross product. This parametrisation lets the Newton iteration update rotations multiplicatively, $\boldsymbol{\Lambda}^{(k+1)} = \exp(\widehat{\Delta\boldsymbol{\psi}})\,\boldsymbol{\Lambda}^{(k)}$, which keeps every iterate exactly on $SO(3)$ and avoids the drift an additive update would produce, while translations live in $\mathbb{R}^3$ and are updated additively. At the end of each converged step the rotation tensor is inverted back into a rotation vector for storage using Spurrier's algorithm \citep{spurrier_comment_1978}.
 
+\noindent
 The translational strain vector and the curvature vector are defined in a material co-rotated setting,
 \begin{equation}
 \boldsymbol{\Gamma} = \boldsymbol{\Lambda}^T \mathbf{r}' - \boldsymbol{\Lambda}_0^T \mathbf{r}_0',
@@ -70,6 +77,7 @@ The translational strain vector and the curvature vector are defined in a materi
 \end{equation}
 where $(\cdot)' = \partial(\cdot)/\partial s$ and $\boldsymbol{\Lambda}_0(s)$ is the rotation tensor of the initial configuration. Rotating each strain quantity back into the local body-attached basis removes any superposed rigid-body motion, so both measures vanish identically when the whole beam is translated and rotated rigidly, as objectivity requires. The first component of $\boldsymbol{\Gamma}$ is axial extension and the remaining components are shear, while the first component of $\mathbf{K}$ is torsion and the remaining components are bending.
 
+\noindent
 A hyperelastic constitutive model is adopted in which the internal energy per unit reference length is quadratic in the strain measures, so that the material force and moment resultants are $\mathbf{N} = \mathbf{C}_N \boldsymbol{\Gamma}$ and $\mathbf{M} = \mathbf{C}_M \mathbf{K}$ with
 \begin{equation}
 \mathbf{C}_N = \mathrm{diag}\left(EA,\;GA_2,\;GA_3\right),
@@ -79,6 +87,7 @@ A hyperelastic constitutive model is adopted in which the internal energy per un
 \end{equation}
 where $E$ and $G$ are Young's and shear moduli, $A$ the cross-sectional area, $A_2$ and $A_3$ the effective shear areas, $I_2$ and $I_3$ the second moments of area, and $J$ the torsion constant. This diagonal form is appropriate for the bi-symmetric cross-sections used in every case reported here. The spatial resultants follow by push-forward, $\mathbf{n} = \boldsymbol{\Lambda}\mathbf{N}$ and $\mathbf{m} = \boldsymbol{\Lambda}\mathbf{M}$.
 
+\noindent
 The balance of linear and angular momentum along the centreline reads
 \begin{equation}
 \mathbf{n}' + \mathbf{f} \;=\; \rho_{b}A\,\ddot{\mathbf{w}},
@@ -97,6 +106,7 @@ where $\mathbf{f}$ and $\mathbf{t}$ are the external distributed force and torqu
 \label{sec:beamExternalLoading}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+\noindent
 The distributed external force per unit length in Eq.~\eqref{eq:ForceBalanceDynamic} comprises a hydrodynamic drag force and a net buoyancy force, $\mathbf{f} = \mathbf{f}_{d} + \mathbf{f}_{b}$. The drag follows the quasi-steady Morison formulation \citep{morison_force_1950}, split into tangential and normal components relative to the local beam tangent,
 \begin{equation}
 \mathbf{f}_{d} \;=\; \tfrac{1}{2}\,\rho_{f}\,d\,
@@ -110,6 +120,7 @@ where $\rho_{f}$ is the fluid density, $d$ the cross-section drag reference leng
 \label{eq:fext_buoyancy}
 \end{equation}
 
+\noindent
 The closure carries no added-mass term. When a beam accelerates through the surrounding fluid, the displaced fluid exerts an additional inertial reaction, which the classical Morison formulation represents as
 \begin{equation}
 \mathbf{f}_{a} \;=\; \rho_{f}\,A\,\bigl(
@@ -120,4 +131,5 @@ C_{Mt}\,\mathbf{a}_{r,t}
 \end{equation}
 with $\mathbf{a}_{r} = \mathbf{a}_{b} - \mathbf{a}_{f}$ the relative acceleration, $C_{Mt}$ and $C_{Mn}$ the added-mass coefficients, and the third term the Froude--Krylov contribution carried by the undisturbed fluid acceleration. Equation~\eqref{eq:fext_addedmass} is not evaluated in the present model, so $C_{Mt} = C_{Mn} = 0$ throughout and the closure is quasi-steady and drag-only. This is a deliberate scope decision, and its consequences are quantified explicitly in Sections~\ref{sec:leaflet} and~\ref{sec:flexveg}, where the omission emerges as the leading closure limitation.
 
+\noindent
 Equations~\eqref{eq:fext_drag} and~\eqref{eq:fext_buoyancy} are a modelling approximation of the hydrodynamic load, not an exact expression for it. In a body-fitted calculation the force follows from integrating the resolved pressure and viscous traction over the wetted surface, and it therefore carries the added-mass and history contributions produced by the local flow field. The present closure replaces that surface integral with a quasi-steady drag law evaluated from a single sampled velocity per actuator point, using coefficients fixed in advance. The size of the resulting error, and the range of conditions in which the approximation remains acceptable, are quantified against benchmark and experimental data in the sections that follow rather than assumed.
