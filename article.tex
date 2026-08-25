@@ -23,7 +23,7 @@
 \usepackage{geometry}
 \usepackage[section]{placeins}
 \usepackage{enumitem}
-\usepackage{color,soul}
+\usepackage{color}
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{tikz}
@@ -55,17 +55,6 @@ textheight=24cm,
 \DeclareUnicodeCharacter{FB02}{fl}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Author-review placeholders.
-%
-% Every open item in this manuscript is written as an ordinary paragraph
-% wrapped in \hl{...}. Grep for "\\hl{" to list them, and delete the
-% highlighted paragraphs before submission. To keep the text but drop the
-% yellow background, uncomment the \renewcommand line below.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\sethlcolor{yellow}
-% Submission version: \renewcommand{\hl}[1]{#1}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
 \title[Two-way actuator-line coupling of a finite-volume beam]{Two-way actuator-line coupling of a geometrically exact finite-volume beam with incompressible and free-surface flow}
@@ -80,7 +69,7 @@ textheight=24cm,
 \affil[2]{\orgdiv{Faculty of Mechanical Engineering and Naval Architecture}, \orgname{University of Zagreb}, \orgaddress{\country{Croatia}}}
 
 \abstract{
-Slender flexible structures such as mooring lines, aquaculture netting, and aquatic vegetation are too thin for their surfaces to be resolved economically by a body-fitted mesh, yet they exchange momentum with the surrounding flow in both directions. This paper presents a two-way actuator-line coupling in which a geometrically exact Simo--Reissner beam, discretised by a cell-centred finite volume method on a one-dimensional centreline mesh, is embedded directly in an incompressible finite volume flow solver. The fluid velocity is sampled at a prescribed offset upstream of each beam control volume, a quasi-steady Morison-type drag closure evaluates the hydrodynamic line force, and the equal and opposite reaction is projected back into the fluid momentum equation through a normalised Gaussian kernel. The structural and fluid subsystems share one discretisation, one mesh and field infrastructure, one time loop, and one domain decomposition, so the coupling reduces to two transfer operators between non-matching meshes rather than an interface between two codes. Both operators are formulated to be parallel consistent, and the projection conserves the transferred resultant force to round-off independently of the mesh and the kernel width. The framework is implemented in OpenFOAM and released publicly. It is verified against two channel-flow benchmarks and validated against a wave-flume experiment on a flexible vegetation stem, with every drag coefficient fixed in advance from a separate rigid-body calculation or from published fits. In a steady confined channel the predicted tip deflection is $5.73~\mathrm{mm}$, inside the $4.7$--$6.0~\mathrm{mm}$ band spanned by three published solutions that resolve the same cantilever as a two-dimensional continuum, and six sensitivity studies establish that this result is converged. Under sinusoidal forcing the period is reproduced exactly at both Strouhal numbers tested. At a Strouhal number of $1$ the peak tip excursion is over-predicted at both Reynolds numbers, and at a Strouhal number of $0.5$ it is under-predicted by $30\%$, which is traced to the added-mass and history terms the closure omits. In the wave flume the simulated stem motion reproduces the measured mode shape, the intra-wave asymmetry, the distributed force, and the base force, and the tip excursion at the upper published drag coefficient matches the measurement to within $1\%$, while the oscillation range is recovered to $71$--$83\%$ at the three conditions inside the quasi-static regime, which span a threefold change in Keulegan--Carpenter number and tip excursions up to a third of the stem length. A quasi-static reconstruction test reproduces the coupled response to $97$--$98\%$ in amplitude and exactly in phase at every condition, which places the residual deficit in the construction of the hydrodynamic load rather than in the structural model. The omitted fluid inertia of the drag-only closure is identified as the leading missing term, and the resulting $15$--$20\%$ amplitude deficit is reported as the quantified cost of that omission rather than removed by recalibration.
+Slender flexible structures such as mooring lines, aquaculture netting, and aquatic vegetation are too thin for their surfaces to be resolved economically by a body-fitted mesh, yet they exchange momentum with the surrounding flow in both directions. This paper presents a two-way actuator-line coupling in which a geometrically exact Simo--Reissner beam, discretised by a cell-centred finite volume method on a one-dimensional centreline mesh, is embedded directly in an incompressible finite volume flow solver. The fluid velocity is sampled at a prescribed offset upstream of each beam control volume, a quasi-steady Morison-type drag closure evaluates the hydrodynamic line force, and the equal and opposite reaction is projected back into the fluid momentum equation through a normalised Gaussian kernel. The structural and fluid subsystems share one discretisation, one mesh and field infrastructure, one time loop, and one domain decomposition, so the coupling reduces to two transfer operators between non-matching meshes rather than an interface between two codes. Both operators are formulated to be parallel consistent, and the projection conserves the transferred resultant force to round-off independently of the mesh and the kernel width. The framework is implemented in OpenFOAM and released publicly. It is verified against two channel-flow benchmarks and validated against a wave-flume experiment on a flexible vegetation stem, with every drag coefficient fixed in advance from a separate rigid-body calculation or from published fits. In a steady confined channel the predicted tip deflection lies inside the band spanned by three published solutions that resolve the same cantilever as a two-dimensional continuum, and six sensitivity studies establish that this result is converged. Under sinusoidal forcing the period is reproduced exactly at both Strouhal numbers tested, while the peak tip excursion is over-predicted at the higher Strouhal number and under-predicted at the lower one, which is traced to the added-mass and history terms the closure omits. In the wave flume the simulated stem motion reproduces the measured mode shape, the intra-wave asymmetry, the distributed force, and the base force, the tip excursion at the upper published drag coefficient matches the measurement closely, and most of the measured oscillation range is recovered at the three conditions inside the quasi-static regime, which span a wide range of Keulegan--Carpenter number and tip excursions of a substantial fraction of the stem length. A quasi-static reconstruction test reproduces the coupled response almost exactly in amplitude and exactly in phase at every condition, which places the residual deficit in the construction of the hydrodynamic load rather than in the structural model. The omitted fluid inertia of the drag-only closure is identified as the leading missing term, and the resulting amplitude deficit is reported as the quantified cost of that omission rather than removed by recalibration.
 }
 
 \keywords{Fluid--structure interaction, Actuator line method, Geometrically exact beam, Simo--Reissner, Finite volume method, Distributed forcing, Flexible vegetation, OpenFOAM}
@@ -122,28 +111,6 @@ Slender flexible structures such as mooring lines, aquaculture netting, and aqua
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \backmatter
 
-\noindent
-\hl{File size and manuscript length both need a production pass before submission. The
-compiled PDF is about \mbox{$69~\mathrm{MB}$}, and almost all of it is the six streamline
-snapshot figures, which are \mbox{$11~\mathrm{MB}$} each because the streamlines are
-stored as vector paths. Most submission systems cap uploads well below that. Rasterising
-those six files at \mbox{$600~\mathrm{dpi}$} brings the document under
-\mbox{$10~\mathrm{MB}$} with no visible loss at the printed size, for example with
-\mbox{\texttt{gs -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress}}
-\mbox{\texttt{-dColorImageResolution=600 -o out.pdf in.pdf}} applied to each snapshot
-file. One cosmetic point while you are in there: the three legend strips under
-\mbox{Figure~\ref{fig:beamInTunnel_discretisation}} were generated at different font
-sizes, so the beam-mesh legend renders noticeably larger than its two neighbours.
-Regenerating that one legend at the same source font size as the others would tidy it. On
-length, the manuscript runs to about \mbox{$63$} pages, but that is the draft layout
-inherited from the template, which sets \mbox{\texttt{parskip}} to a full baseline and
-turns on one-and-a-half line spacing. Setting
-\mbox{\texttt{\textbackslash setlength\{\textbackslash parskip\}\{0pt\}}} and dropping
-\mbox{\texttt{onehalfspacing}} brings the same content to roughly \mbox{$35$} pages, which
-is where it should sit for any of the three target journals. If a further cut is wanted,
-the leaflet snapshot sequence of \mbox{Section~\ref{sec:leaflet_snapshots}} can drop from
-four phases to two.}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Data availability}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -152,24 +119,22 @@ The coupling library presented here is publicly available at
 \url{https://github.com/solids4foam/moorFV}, and the finite volume beam solver it builds on
 is available at \url{https://github.com/solids4foam/beamFoam}.
 
-\noindent
-\hl{Data availability statement. Please confirm the two repository addresses and the
-branch or release tag that reproduces the results in this paper (the thesis work used the
-\mbox{\texttt{openfoam-v2306}} branch of moorFV and the \mbox{\texttt{alm-on-main}} branch
-of beamFoam). All three candidate journals now expect the case set-ups and the
-post-processing scripts to be deposited as well. A Zenodo archive of the four case
-directories, the digitised reference data, and the plotting scripts, cited by DOI here,
-would be the cleanest way to satisfy that.}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Acknowledgements}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \noindent
-\hl{Acknowledgements and funding. Please supply the funding statement that applies to this
-work, together with the computing acknowledgement for the machines the production runs
-were executed on. The wave-flume simulations of \mbox{Section~\ref{sec:flexveg}} were run
-on LuxProvide Meluxina, which has its own required acknowledgement wording and project
-number.}
+The authors would like to acknowledge Research Ireland, NexSys project 21/SPP/3756, for
+funding. Vikram Pakrashi would like to acknowledge SEAI RDD/966 FlowDyn and Research Ireland
+MaREI RC2302-2 projects. Philip Cardiff gratefully acknowledges financial support from the
+Irish Research Council (IRC) through the Laureate programme, grant number IRCLA/2017/45 and
+the European Research Council (ERC) under the European Union's Horizon 2020 research and
+innovation programme (Grant Agreement No.\ 101088740).
+
+\noindent
+Additionally, the authors wish to acknowledge the Irish Centre for High-End Computing (ICHEC)
+for the provision of computational facilities and support (www.ichec.ie), and part of this
+work has been carried out using the UCD ResearchIT Sonic cluster which was funded by UCD IT
+Services and the UCD Research Office.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Declarations}
