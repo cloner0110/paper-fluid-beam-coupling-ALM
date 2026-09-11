@@ -9,22 +9,12 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \noindent
-The beam domain $s\in[0,L]$ is discretised into non-overlapping one-dimensional control volumes (CVs). Let cell $P$ be bounded by the faces $w$ and $e$, with cell length $L_P$, and let $W$ and $E$ be its neighbours, as in Figure~\ref{fig:beamCV}. The centreline position and the rotation parameters are stored at the CV centres, the spatial resultants $(\mathbf{n},\mathbf{m})$ are evaluated at the faces by linear interpolation of the cell-centred kinematic quantities \citep{bali_cell-centered_2022}, and the external loading is collocated at the cell centre.
-
-\begin{figure}[!ht]
-\centering
-\includegraphics[width=0.92\textwidth]{beamDynamicCV.pdf}
-\caption{Balance over a generic beam control volume $P$. The internal force resultants $\mathbf{n}_{w}$ and $\mathbf{n}_{e}$ at the west and east faces and the external distributed load $\mathbf{f}_{\mathrm{ext},P}\,L_{P}$ at the cell centre $C$ form the quasi-static part of the balance. Integrating the inertial terms over the same cell with the midpoint rule adds the translational inertia $\rho_{b}A\,L_{P}\,\ddot{\mathbf{w}}_{P}$ to the three translational rows and the rotary-plus-gyroscopic moment $L_{P}\,\boldsymbol{\Lambda}_{P}(\mathbf{I}_{\rho}\dot{\boldsymbol{\Omega}}_{P} + \boldsymbol{\Omega}_{P}\times\mathbf{I}_{\rho}\boldsymbol{\Omega}_{P})$ to the three rotational rows. $W$ and $E$ mark the neighbouring cell centres of the three-point stencil.}
-\label{fig:beamCV}
-\end{figure}
-
-\noindent
-Integrating Eqs.~\eqref{eq:ForceBalanceDynamic}--\eqref{eq:MomentBalanceDynamic} over cell $P$ gives the locally conservative discrete form
+The beam domain $s\in[0,L]$ is discretised into non-overlapping one-dimensional control volumes (CVs). The centreline position and the rotation parameters are stored at the CV centres, the spatial resultants $(\mathbf{n},\mathbf{m})$ are evaluated at the faces by linear interpolation of the cell-centred kinematic quantities, and the external loading is collocated at the cell centre \citep{bali_cell-centered_2022}. Integrating Eqs.~\eqref{eq:ForceBalanceDynamic}--\eqref{eq:MomentBalanceDynamic} over a cell $P$ of length $L_{P}$, bounded by the faces $w$ and $e$ and neighboured by the cells $W$ and $E$, gives the locally conservative discrete form
 \begin{align}
 \mathbf{n}_{e} - \mathbf{n}_{w} + \mathbf{f}_{P}\,L_{P} &= \rho_{b}A\,L_{P}\,\ddot{\mathbf{w}}_{P}, \label{eq:fvForceBalance} \\
 \mathbf{m}_{e} - \mathbf{m}_{w} + \bigl(\mathbf{r}'\times\mathbf{n}\bigr)_{P}\,L_{P} + \mathbf{t}_{P}\,L_{P} &= L_{P}\,\boldsymbol{\Lambda}_{P}\bigl(\mathbf{I}_{\rho}\dot{\boldsymbol{\Omega}}_{P} + \boldsymbol{\Omega}_{P}\times(\mathbf{I}_{\rho}\boldsymbol{\Omega}_{P})\bigr), \label{eq:fvMomentBalance}
 \end{align}
-with the cell-centre source terms already using the midpoint-rule approximation of the volume integral. The face resultants are nonlinear functions of the kinematic unknowns at cells $P$, $W$, and $E$ through Eqs.~\eqref{eq:GammaKDef} and~\eqref{eq:CNCM}.
+with the cell-centre source terms already using the midpoint-rule approximation of the volume integral. The face resultants are nonlinear functions of the kinematic unknowns at cells $P$, $W$, and $E$.
 
 \noindent
 The unknowns at each CV centre are organised as the six-component increment $\boldsymbol{\phi}_P = (\Delta\mathbf{w}_P,\,\Delta\boldsymbol{\psi}_P)^{T}$ between successive Newton iterates, so the translational and rotational rows are solved simultaneously. Linearising about the current iterate gives the three-point finite volume form
@@ -32,25 +22,14 @@ The unknowns at each CV centre are organised as the six-component increment $\bo
 \mathbf{A}_{W}\,\boldsymbol{\phi}_{W} \;+\; \mathbf{A}_{P}\,\boldsymbol{\phi}_{P} \;+\; \mathbf{A}_{E}\,\boldsymbol{\phi}_{E} \;=\; \mathbf{b}_{P},
 \label{eq:fvDiscreteSystem}
 \end{equation}
-in which the coefficients are dense $6\times 6$ blocks mixing the translation and rotation rows and $\mathbf{b}_{P}$ is the residual of cell $P$. Assembling over all CVs yields a sparse block-tridiagonal system of size $6N_b\times 6N_b$, where $N_b$ is the number of beam cells. The dense off-diagonal blocks arise because the translational and rotational unknowns are tightly coupled by the moment-balance cross-product $\mathbf{r}'\times\mathbf{n}$, so a partitioned solve that updated translations and rotations in turn would lose this coupling and converge poorly in the large-rotation regime.
-
-\noindent
-The system is solved by a Newton--Raphson iteration. Stacking the per-CV residuals gives $\mathbf{K}^{(k)}\boldsymbol{\phi}^{(k)} = -\mathbf{R}(\mathbf{w}^{(k)},\boldsymbol{\Lambda}^{(k)})$ with $\mathbf{K}^{(k)}$ the global tangent matrix, and the kinematic fields are then updated cell by cell,
+in which the coefficients are dense $6\times 6$ blocks mixing the translation and rotation rows, which the moment-balance cross-product $\mathbf{r}'\times\mathbf{n}$ couples tightly, and $\mathbf{b}_{P}$ is the residual of cell $P$. Assembling over all CVs yields a sparse block-tridiagonal system of size $6N_b\times 6N_b$, where $N_b$ is the number of beam cells. It is solved by a Newton--Raphson iteration in which the kinematic fields are updated cell by cell,
 \begin{equation}
 \mathbf{w}^{(k+1)} \;=\; \mathbf{w}^{(k)} + \Delta\mathbf{w}^{(k)},
 \qquad
-\boldsymbol{\Lambda}^{(k+1)} \;=\; \exp\!\left(\widehat{\Delta\boldsymbol{\psi}^{(k)}}\right)\,\boldsymbol{\Lambda}^{(k)}.
+\boldsymbol{\Lambda}^{(k+1)} \;=\; \exp\!\left(\widehat{\Delta\boldsymbol{\psi}^{(k)}}\right)\,\boldsymbol{\Lambda}^{(k)},
 \label{eq:beamNewtonUpdate}
 \end{equation}
-The iteration continues until both the increment norm $\max(\|\Delta\mathbf{w}^{(k)}\|,\|\Delta\boldsymbol{\psi}^{(k)}\|)$ and the residual norm fall below prescribed tolerances, the two being monitored separately because one component can converge several orders of magnitude faster than the other in the large-rotation regime.
-
-\noindent
-Two time-integration schemes are available for the acceleration terms. All transient results reported here use the first-order backward scheme,
-\begin{equation}
-\ddot{\mathbf{w}}^{\,n} \;=\; \frac{\mathbf{w}^{\,n} - 2\mathbf{w}^{\,n-1} + \mathbf{w}^{\,n-2}}{\Delta t^{2}},
-\label{eq:beamThreeLevel}
-\end{equation}
-with the analogous construction for $\dot{\boldsymbol{\Omega}}$, and a Newmark scheme is available as an alternative. In either case the current-level unknown appears linearly, so the inertia term contributes a diagonal-block coefficient of $\rho_{b}A\,L_{P}/\Delta t^{2}$ to $\mathbf{A}_{P}$, the history terms enter the residual, and the block-tridiagonal structure is unchanged. Time steps between $10^{2}$ and $4\times10^{4}$ steps per forcing period are used, and each transient case is started from rest.
+until both the increment norm and the residual norm fall below prescribed tolerances. The tangent coefficients and the verification of the discretisation are given by \citet{bali_cell-centered_2022,bali_finite_2024}, and its OpenFOAM implementation by \citet{bali_beamfoam_2025}. All transient results reported here integrate the acceleration terms with a first-order backward scheme, in which the current-level unknown appears linearly, so the inertia term contributes a diagonal-block coefficient of $\rho_{b}A\,L_{P}/\Delta t^{2}$ to $\mathbf{A}_{P}$, the history terms enter the residual, and the block-tridiagonal structure is unchanged. Time steps between $10^{2}$ and $4\times10^{4}$ steps per forcing period are used, and each transient case is started from rest.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Actuator-line beam--fluid coupling}
@@ -133,7 +112,7 @@ Figure~\ref{fig:almCouplingSchematic} summarises the information exchange betwee
   \node[steplabel] at ( 5.0, 4.0) {6};
 \end{tikzpicture}
 }
-\caption{Centreline coupling drawn as a per-time-step data-flow diagram between the three solver components. \protect\textcircled{1} The beam solver advances the structural state and produces the current actuator-point positions and velocities; \protect\textcircled{2} these pass to the coupling operator; \protect\textcircled{3} the fluid solver supplies the upstream-sampled velocity at every actuator point; the operator evaluates the hydrodynamic line force and returns it as \protect\textcircled{4} a regularised volumetric reaction source to the fluid solver and \protect\textcircled{5} an equal and opposite line load to the beam solver; \protect\textcircled{6} the fluid pressure--velocity system is advanced before the next time step.}
+\caption{Centreline coupling drawn as a per-time-step data-flow diagram between the three solver components. \protect\textcircled{1} The beam solver advances the structural state and produces the current actuator-point positions and velocities; \protect\textcircled{2} these pass to the coupling operator; \protect\textcircled{3} the fluid solver supplies the upstream-sampled velocity at every actuator point; the operator evaluates the hydrodynamic line force and returns it as \protect\textcircled{4} a regularised volumetric reaction source to the fluid solver and \protect\textcircled{5} an equal and opposite line load to the beam solver; \protect\textcircled{6} the fluid pressure--velocity system is advanced before the next time step. The sequence runs once per time step, on the first outer iteration of the PIMPLE loop, so the reaction source of \protect\textcircled{4} stays fixed for the remaining outer iterations.}
 \label{fig:almCouplingSchematic}
 \end{figure}
 
@@ -264,7 +243,7 @@ This normalisation makes the resultant of the applied source exact by constructi
 Algorithm~\ref{alg:almCoupling} summarises the operations performed at every time step, each labelled with the equation it implements.
 
 \begin{algorithm}[!ht]
-\caption{Actuator-line beam--fluid coupling, executed once per time step.}
+\caption{Actuator-line beam--fluid coupling, executed once per time step, on the first outer iteration of the PIMPLE loop.}
 \label{alg:almCoupling}
 \begin{algorithmic}[1]
 \STATE Update the beam displacement, rotation, velocity, and the actuator-point positions $\mathbf{P}_{a,i}$ for all beam cells $i=1,\ldots,N_{b}$, using Eq.~\eqref{eq:almActuatorPoint}, and evaluate the deformed centreline tangents $\mathbf{e}_{t,i}$.
@@ -280,7 +259,7 @@ Algorithm~\ref{alg:almCoupling} summarises the operations performed at every tim
 \end{algorithm}
 
 \noindent
-The line force is evaluated once per time step, before the structural Newton loop, and held fixed for the remainder of the step. This choice is deliberate. The sampling point moves with the beam, so a large enough change in displacement between Newton iterations can carry that point across a fluid cell boundary. The sampled velocity then jumps between two neighbouring cells, the force jumps with it, and the iteration oscillates between two states instead of converging. Freezing the force removes that failure mode, at the cost of making the coupling explicitly staggered, with the interface load lagging the fluid solution by one time step. The empirical size of that lag is bounded in Section~\ref{sec:beamtunnel_sensitivity}, where driving the pressure--velocity system to convergence within the step, rather than taking a single outer iteration, changes the steady tip displacement by $0.1\%$.
+The line force is evaluated once per time step, on the first outer iteration of the PIMPLE loop and before the structural Newton loop, and is then held fixed for the remainder of the step. The later outer iterations solve the pressure--velocity system against that frozen source and do not re-sample the fluid velocity, so the interface load is treated explicitly rather than implicitly. This choice is deliberate. The sampling point moves with the beam, so a large enough change in displacement between Newton iterations can carry that point across a fluid cell boundary. The sampled velocity then jumps between two neighbouring cells, the force jumps with it, and the iteration oscillates between two states instead of converging. Freezing the force removes that failure mode, at the cost of a staggered coupling in which the interface load lags the fluid solution by one time step. The implementation can also re-fire the sampling and the structural solve at every outer iteration, which makes the interface load implicit but returns the discontinuous sampling to the inside of the iteration and requires strong under-relaxation of the line force to stay stable, so that option is not used for any result reported here. The empirical size of the lag is bounded in Section~\ref{sec:beamtunnel_sensitivity}, where driving the pressure--velocity system to convergence within the step, rather than taking a single outer iteration, changes the steady tip displacement by $0.1\%$.
 
 \noindent
 The two cell searches in steps~2 and~4 govern the parallel behaviour of the update. Searching the entire fluid mesh for each query point would cost $\mathcal{O}(N_{b}N_{c})$ point-in-cell tests per time step, which is prohibitive on the meshes used in Section~\ref{sec:flexveg}. The cost is reduced in two complementary ways. The actuator points of adjacent beam cells lie within a beam-cell length of each other, typically much smaller than the local fluid cell size, so their containing cells are either identical or face neighbours. The implementation therefore stores a seed cell for each beam cell, taken from the previously processed one, and walks from that seed across face neighbours toward the query point until either the containing cell is found or the walk exits the local subdomain, which terminates in $\mathcal{O}(1)$ face traversals in the steady-state limit. A failed walk falls back to a single global search on the local subdomain, so the only $\mathcal{O}(N_{c})$ search per time step is the cold start on the first beam cell of each rank.

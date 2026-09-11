@@ -3,8 +3,6 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\setlength{\parskip}{\baselineskip}
-
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts,bm}
@@ -35,7 +33,7 @@ a4paper,
 textwidth=15cm,
 textheight=24cm,
 }
-\usepackage[onehalfspacing]{setspace}
+\usepackage{setspace}
 % \usepackage{lineno}
 % \linenumbers
 
@@ -80,7 +78,7 @@ textheight=24cm,
 \affil[2]{\orgdiv{Faculty of Mechanical Engineering and Naval Architecture}, \orgname{University of Zagreb}, \orgaddress{\country{Croatia}}}
 
 \abstract{
-Slender flexible structures such as mooring lines, aquaculture netting, and aquatic vegetation are too thin for their surfaces to be resolved economically by a body-fitted mesh, yet they exchange momentum with the surrounding flow in both directions. This paper presents a two-way actuator-line coupling in which a geometrically exact Simo--Reissner beam, discretised by a cell-centred finite volume method on a one-dimensional centreline mesh, is embedded directly in an incompressible finite volume flow solver. The fluid velocity is sampled at a prescribed offset upstream of each beam control volume, a quasi-steady Morison-type drag closure evaluates the hydrodynamic line force, and the equal and opposite reaction is projected back into the fluid momentum equation through a normalised Gaussian kernel. The structural and fluid subsystems share one discretisation, one mesh and field infrastructure, one time loop, and one domain decomposition, so the coupling reduces to two transfer operators between non-matching meshes rather than an interface between two codes. Both operators are formulated to be parallel consistent, and the projection conserves the transferred resultant force to round-off independently of the mesh and the kernel width. The framework is implemented in OpenFOAM and released publicly. It is verified against two channel-flow benchmarks and validated against a wave-flume experiment on a flexible vegetation stem, with every drag coefficient fixed in advance from a separate rigid-body calculation or from published fits. In a steady confined channel the predicted tip deflection is $5.73~\mathrm{mm}$, inside the $4.7$--$6.0~\mathrm{mm}$ band spanned by three published solutions that resolve the same cantilever as a two-dimensional continuum, and six sensitivity studies establish that this result is converged. Under sinusoidal forcing the period is reproduced exactly at both Strouhal numbers tested. At a Strouhal number of $1$ the peak tip excursion is over-predicted at both Reynolds numbers, and at a Strouhal number of $0.5$ it is under-predicted by $30\%$, which is traced to the added-mass and history terms the closure omits. In the wave flume the simulated stem motion reproduces the measured mode shape, the intra-wave asymmetry, the distributed force, and the base force, and the tip excursion at the upper published drag coefficient matches the measurement to within $1\%$, while the oscillation range is recovered to $71$--$83\%$ at the three conditions inside the quasi-static regime, which span a threefold change in Keulegan--Carpenter number and tip excursions up to a third of the stem length. A quasi-static reconstruction test reproduces the coupled response to $97$--$98\%$ in amplitude and exactly in phase at every condition, which places the residual deficit in the construction of the hydrodynamic load rather than in the structural model. The omitted fluid inertia of the drag-only closure is identified as the leading missing term, and the resulting $15$--$20\%$ amplitude deficit is reported as the quantified cost of that omission rather than removed by recalibration.
+Slender flexible structures such as mooring lines, aquaculture netting, and aquatic vegetation are too thin to be resolved economically by a body-fitted mesh, yet they exchange momentum with the flow in both directions. This paper presents a finite volume actuator-line formulation for the fluid--structure interaction of such structures, in which a geometrically exact Simo--Reissner beam, discretised by a cell-centred finite volume method, is coupled two-way to an incompressible finite volume flow solver through conservative and parallel-consistent transfer operators. The fluid velocity is sampled upstream of each beam control volume, a quasi-steady Morison-type drag closure evaluates the line force, and the equal and opposite reaction is projected back into the fluid momentum equation through a normalised Gaussian kernel that conserves the transferred force to round-off. The two subsystems share one discretisation, one time loop, and one domain decomposition, so no external structural code is required, and the OpenFOAM implementation is released publicly. The accuracy limits of the drag-only closure are then quantified against two channel benchmarks and a wave-flume experiment, with all drag coefficients fixed in advance. In a steady confined channel the predicted tip deflection falls inside the band spanned by three published continuum solutions, and under sinusoidal forcing the peak tip excursion departs from the reference once the added-mass and history forces become important. In the wave flume the simulated stem reproduces the measured mode shape, the intra-wave asymmetry, and the base force, and recovers $71$--$83\%$ of the oscillation range. A quasi-static reconstruction test places the residual $15$--$20\%$ amplitude deficit in the omitted fluid inertia rather than in the structural model.
 }
 
 \keywords{Fluid--structure interaction, Actuator line method, Geometrically exact beam, Simo--Reissner, Finite volume method, Distributed forcing, Flexible vegetation, OpenFOAM}
@@ -135,14 +133,10 @@ file. One cosmetic point while you are in there: the three legend strips under
 \mbox{Figure~\ref{fig:beamInTunnel_discretisation}} were generated at different font
 sizes, so the beam-mesh legend renders noticeably larger than its two neighbours.
 Regenerating that one legend at the same source font size as the others would tidy it. On
-length, the manuscript runs to about \mbox{$63$} pages, but that is the draft layout
-inherited from the template, which sets \mbox{\texttt{parskip}} to a full baseline and
-turns on one-and-a-half line spacing. Setting
-\mbox{\texttt{\textbackslash setlength\{\textbackslash parskip\}\{0pt\}}} and dropping
-\mbox{\texttt{onehalfspacing}} brings the same content to roughly \mbox{$35$} pages, which
-is where it should sit for any of the three target journals. If a further cut is wanted,
-the leaflet snapshot sequence of \mbox{Section~\ref{sec:leaflet_snapshots}} can drop from
-four phases to two.}
+length, the draft layout inherited from the template has been replaced by the class
+defaults, so \mbox{\texttt{parskip}} is zero, paragraphs are separated by indentation, and
+the line spacing is single. If a further cut is wanted, the leaflet snapshot sequence of
+\mbox{Section~\ref{sec:leaflet_snapshots}} can drop from four phases to two.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Data availability}
