@@ -53,26 +53,22 @@ textheight=24cm,
 \DeclareUnicodeCharacter{FB02}{fl}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Author-review placeholders.
-%
-% Every open item in this manuscript is written as an ordinary paragraph
-% wrapped in \hl{...}. Grep for "\\hl{" to list them, and delete the
-% highlighted paragraphs before submission. To keep the text but drop the
-% yellow background, uncomment the \renewcommand line below.
+% One open item remains, marked FIGURE REUSE PERMIT in Section 7.7, where
+% two panels are reproduced from a published figure. Delete that marker
+% once the permission is in place.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \sethlcolor{yellow}
-% Submission version: \renewcommand{\hl}[1]{#1}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
 \title[Two-way actuator-line coupling of a finite-volume beam]{Two-way actuator-line coupling of a geometrically exact finite-volume beam with incompressible and free-surface flow}
 
-\author*[1]{\fnm{Amirhossein} \sur{Taran}}\email{amirhossein.taran@ucdconnect.ie}
+\author[1]{\fnm{Amirhossein} \sur{Taran}}
 \author[1]{\fnm{Seevani} \sur{Bali}}
 \author[2]{\fnm{\v{Z}eljko} \sur{Tukovi\'{c}}}
 \author[1]{\fnm{Vikram} \sur{Pakrashi}}
-\author[1]{\fnm{Philip} \sur{Cardiff}}
+\author*[1]{\fnm{Philip} \sur{Cardiff}}\email{philip.cardiff@ucd.ie}
 
 \affil[1]{\orgdiv{School of Mechanical and Materials Engineering}, \orgname{University College Dublin}, \orgaddress{\country{Ireland}}}
 \affil[2]{\orgdiv{Faculty of Mechanical Engineering and Naval Architecture}, \orgname{University of Zagreb}, \orgaddress{\country{Croatia}}}
@@ -118,25 +114,11 @@ Slender flexible structures such as mooring lines, aquaculture netting, and aqua
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\backmatter
+\input{sections/sectionAppendix.tex}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\noindent
-\hl{File size and manuscript length both need a production pass before submission. The
-compiled PDF is about \mbox{$69~\mathrm{MB}$}, and almost all of it is the six streamline
-snapshot figures, which are \mbox{$11~\mathrm{MB}$} each because the streamlines are
-stored as vector paths. Most submission systems cap uploads well below that. Rasterising
-those six files at \mbox{$600~\mathrm{dpi}$} brings the document under
-\mbox{$10~\mathrm{MB}$} with no visible loss at the printed size, for example with
-\mbox{\texttt{gs -sDEVICE=pdfwrite -dPDFSETTINGS=/prepress}}
-\mbox{\texttt{-dColorImageResolution=600 -o out.pdf in.pdf}} applied to each snapshot
-file. One cosmetic point while you are in there: the three legend strips under
-\mbox{Figure~\ref{fig:beamInTunnel_discretisation}} were generated at different font
-sizes, so the beam-mesh legend renders noticeably larger than its two neighbours.
-Regenerating that one legend at the same source font size as the others would tidy it. On
-length, the draft layout inherited from the template has been replaced by the class
-defaults, so \mbox{\texttt{parskip}} is zero, paragraphs are separated by indentation, and
-the line spacing is single. If a further cut is wanted, the leaflet snapshot sequence of
-\mbox{Section~\ref{sec:leaflet_snapshots}} can drop from four phases to two.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\backmatter
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Data availability}
@@ -145,25 +127,6 @@ the line spacing is single. If a further cut is wanted, the leaflet snapshot seq
 The coupling library presented here is publicly available at
 \url{https://github.com/solids4foam/moorFV}, and the finite volume beam solver it builds on
 is available at \url{https://github.com/solids4foam/beamFoam}.
-
-\noindent
-\hl{Data availability statement. Please confirm the two repository addresses and the
-branch or release tag that reproduces the results in this paper (the thesis work used the
-\mbox{\texttt{openfoam-v2306}} branch of moorFV and the \mbox{\texttt{alm-on-main}} branch
-of beamFoam). All three candidate journals now expect the case set-ups and the
-post-processing scripts to be deposited as well. A Zenodo archive of the four case
-directories, the digitised reference data, and the plotting scripts, cited by DOI here,
-would be the cleanest way to satisfy that.}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bmhead{Acknowledgements}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\noindent
-\hl{Acknowledgements and funding. Please supply the funding statement that applies to this
-work, together with the computing acknowledgement for the machines the production runs
-were executed on. The wave-flume simulations of \mbox{Section~\ref{sec:flexveg}} were run
-on LuxProvide Meluxina, which has its own required acknowledgement wording and project
-number.}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \bmhead{Declarations}

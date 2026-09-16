@@ -132,7 +132,7 @@ The actuator-point position is reconstructed from three quantities stored on the
 where $\mathbf{C}^{b}_{i}$ is the initial beam-cell centre, $\mathbf{W}^{\mathrm{ref}}_{i}$ a fixed offset that places the actuator point at a chosen material location relative to the cell centre (typically zero, but retained so the point can be shifted onto, for example, the upper surface of a non-axisymmetric cross-section), and $\mathbf{W}_{i}$ the current displacement. The actuator-point velocity is the time derivative of Eq.~\eqref{eq:almActuatorPoint} and equals the beam-cell translational velocity, because the first two terms are time-independent. The local tangent $\mathbf{e}_{t,i}$ is reconstructed from a Hermite spline through the current beam-cell centres, and is needed both to decompose the relative velocity and to define the upstream sampling direction.
 
 \noindent
-The sampling point is placed at a fixed distance upstream of the actuator point, in a direction reconstructed locally from the incoming flow. A preliminary relative velocity is first evaluated at the actuator point itself,
+The sampling point is placed at a fixed distance upstream of the actuator point, in a direction reconstructed locally from the incoming flow, as Figure~\ref{fig:almSamplingSchematic} shows. A preliminary relative velocity is first evaluated at the actuator point itself,
 \begin{equation}
 \mathbf{u}^{0}_{r,i}
 \;=\;
