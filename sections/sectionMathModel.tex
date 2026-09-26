@@ -26,7 +26,7 @@ The fluid is modelled as an incompressible Newtonian flow governed by
 + \mathbf{S}_{m},
 \label{eq:momentum}
 \end{equation}
-where $\mathbf{U}$ is the velocity, $\rho$ the density, $\mu$ the dynamic viscosity, $p$ the pressure, and $\mathbf{g}$ the gravitational acceleration. The term $\mathbf{S}_{m}$ is the volumetric momentum source through which the beam acts on the flow, derived in Section~\ref{sec:almProjection}. The coupled pressure--velocity system is solved with the standard segregated PIMPLE procedure of OpenFOAM, and $\mathbf{S}_{m}$ is updated once per time step rather than at every outer iteration of that procedure, as set out in Section~\ref{sec:almParallelSearch}.
+where $\mathbf{U}$ is the velocity, $\rho$ the density, $\mu$ the dynamic viscosity, $p$ the pressure, and $\mathbf{g}$ the gravitational acceleration. The term $\mathbf{S}_{m}$ is the volumetric momentum source through which the beam acts on the flow, derived in Section~\ref{sec:almProjection}. The pressure--velocity coupling is handled by the segregated PIMPLE algorithm, which combines the pressure-correction steps of the PISO algorithm \citep{issa_solution_1986} with the outer iterations of the SIMPLE algorithm \citep{patankar_calculation_1972} within each time step. The source $\mathbf{S}_{m}$ is updated once per time step rather than at every outer iteration, as set out in Section~\ref{sec:almParallelSearch}.
 
 \noindent
 The coupling operator is formulated independently of the number of fluid phases. The channel-flow benchmarks of Sections~\ref{sec:beamtunnel} and~\ref{sec:leaflet} are single-phase and the wave-flume validation of Section~\ref{sec:flexveg} is two-phase, with the same implementation used unchanged in both. For the two-phase case a volume-of-fluid formulation transports a phase fraction $\alpha$ to distinguish the two immiscible fluids, the system is treated as a single mixture with phase-averaged properties $\rho = \alpha \rho_1 + (1-\alpha)\rho_2$ and $\mu = \alpha \mu_1 + (1-\alpha)\mu_2$, and the phase fraction is advanced by
@@ -36,7 +36,7 @@ The coupling operator is formulated independently of the number of fluid phases.
 + \nabla \cdot \left(\mathbf{U}_r\,\alpha(1-\alpha)\right) = 0,
 \label{eq:alphaTransportCompressed}
 \end{equation}
-in which the third term is the interface-compression flux that counteracts numerical smearing, with $\mathbf{U}_r$ a compression velocity active only near the interface. Boundedness of $\alpha$ is enforced by the MULES limiter \citep{damian_extended_2014}, and the momentum equation is solved in the dynamic-pressure form $p_{\mathrm{rgh}} = p - \rho\,\mathbf{g}\cdot\mathbf{x}$ standard in the \texttt{interFoam} family of solvers.
+in which the third term is the interface-compression flux that counteracts numerical smearing, with $\mathbf{U}_r$ a compression velocity active only near the interface. Boundedness of $\alpha$ is enforced by the MULES limiter \citep{damian_extended_2014}, and the momentum equation is solved for the modified pressure $p_{\mathrm{rgh}} = p - \rho\,\mathbf{g}\cdot\mathbf{x}$, from which the hydrostatic contribution has been removed.
 
 \subsubsection{Regular wave theories, generation, and absorption}
 \label{sec:theory_waves}

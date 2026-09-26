@@ -34,7 +34,7 @@ Fine     & $3.8\times10^{7}$  & $4.2 \times 28.3 \times 2.9$ & $38$ & $3.54$ & $
 The load and the response are converged from the baseline mesh upward. The base-force range is $173.2$, $170.3$ and $173.6~\mathrm{mN}$ on the three meshes, so the baseline sits $1.9\%$ below the fine mesh, and the tip oscillation range is $99.6$, $97.7$ and $100.4~\mathrm{mm}$, a baseline deviation of $2.7\%$. The range of the upstream-sampled velocity that drives the drag agrees to within $2\%$ on all three meshes. One qualification belongs with those numbers. The per-period tip range is constant to $\pm0.1\%$ on the coarse and the baseline meshes, but the fine run is still drifting downward by about $0.4\%$ per period, so its own range is converged only to roughly $\pm1\%$, which is the same order as the deviations quoted. That drift runs toward the baseline value, so a fully settled fine run would improve the agreement rather than worsen it.
 
 \noindent
-Figure~\ref{fig:flexveg_mesh_force} shows that the visible difference on the coarse mesh is phase rather than magnitude. In the difference panel the coarse curve departs from the fine one by up to $13~\mathrm{mN}$ on a range of $173~\mathrm{mN}$, which reads as a substantial load error, but its range is within $0.24\%$ of the fine mesh and it is the baseline that is the outlier in magnitude. The whole of the visible difference is a first-harmonic phase lag of $8.85^{\circ}$, which is $2.5\%$ of a period and accounts for $2 \times 81.9~\mathrm{mN} \times \sin(8.85^{\circ}/2) = 12.6~\mathrm{mN}$. The same lag of $8.7$ to $9.6^{\circ}$ appears in the surface elevation, in the sampled velocity, in the base force, and in the tip displacement, and the lags between those four quantities are mesh-independent to under $1^{\circ}$. The coarse mesh therefore propagates the wave slightly too slowly, and the coupling introduces no mesh-dependent lag of its own.
+Figure~\ref{fig:flexveg_mesh_force} shows that the visible difference on the coarse mesh is phase rather than magnitude. In the difference panel the coarse curve departs from the fine one by up to $13~\mathrm{mN}$ on a range of $173~\mathrm{mN}$, which reads as a substantial load error, but its range is within $0.24\%$ of the fine mesh and it is the baseline that lies furthest from the fine mesh in magnitude. The whole of the visible difference is a first-harmonic phase lag of $8.85^{\circ}$, which is $2.5\%$ of a period and accounts for $2 \times 81.9~\mathrm{mN} \times \sin(8.85^{\circ}/2) = 12.6~\mathrm{mN}$. The same lag of $8.7$ to $9.6^{\circ}$ appears in the surface elevation, in the sampled velocity, in the base force, and in the tip displacement, and the lags between those four quantities are mesh-independent to under $1^{\circ}$. The coarse mesh therefore propagates the wave slightly too slowly, and the coupling introduces no mesh-dependent lag of its own.
 
 \begin{figure}[!ht]
 \centering
@@ -49,14 +49,14 @@ The free surface is where the three meshes differ most, and the difference sits 
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.70\textwidth]{mimic3_mesh_waveElevation.pdf}
+\includegraphics[width=0.67\textwidth]{mimic3_mesh_waveElevation.pdf}
 \caption{Free-surface elevation at the stem over three developed wave periods on the three meshes, referenced to the still water level, with the difference from the fine mesh below. The coarse curve sits below the other two through the whole cycle, which is its missing wave setup; about the local mean the three crests agree to within $2.4\%$. Line styles follow the legend of Figure~\ref{fig:flexveg_mesh_force}.}
 \label{fig:flexveg_mesh_eta}
 \end{figure}
 
 \begin{figure}[!ht]
 \centering
-\includegraphics[width=0.70\textwidth]{mimic3_mesh_waveEnvelope.pdf}
+\includegraphics[width=0.67\textwidth]{mimic3_mesh_waveEnvelope.pdf}
 \caption{Crest and trough envelope along the plateau on the three meshes, referenced to the still water level, with the stem location marked. The coarse envelope lies below the other two at the crest and at the trough alike, at every station rather than only at the stem, which is the signature of its missing wave setup. The $\pm5\%$ modulation along the flume is the standing-wave pattern of a weak outlet reflection. Line styles follow the legend of Figure~\ref{fig:flexveg_mesh_force}.}
 \label{fig:flexveg_mesh_env}
 \end{figure}

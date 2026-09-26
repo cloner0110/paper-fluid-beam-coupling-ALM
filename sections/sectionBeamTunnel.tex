@@ -7,7 +7,7 @@
 The first coupled verification is the soft-beam case of \citet{zhang_immersed_2012} (Section~6.4, Case~1), in which a slender flexible cantilever clamped to the no-slip wall of a narrow channel is bent into a steady deformed shape by a steady, pressure-driven viscous flow. It is an established benchmark for immersed and meshless FSI formulations \citep{long_coupling_esfem_sph_2021,wang_immersed_esfem_2022,yang_peridynamics_iblbm_2022,yan_explicit_velocity_iblbm_2023}. Because the flow is steady and the cantilever settles into a fixed shape, the problem reduces to a static equilibrium in which the drag distributed along the deflected beam is balanced everywhere by the elastic restoring moment. That steadiness is what makes it a convenient first test, since there is no moving interface to capture, no time variation of the inflow, and no vortex shedding.
 
 \noindent
-Every reference study resolves the cantilever as a two-dimensional continuum, and they differ from one another only in the fluid solver and the interface coupling, as Table~\ref{tab:beamtunnel_refstudies} shows. Here the square cross-section enters the formulation only through its area, its second moment of area, and the drag reference length of Section~\ref{sec:almLineForce}, and the domain is one cell thick in the third direction, so the simulation is effectively two-dimensional while the physical thickness of the beam is still carried by the projection operators. What the benchmark tests is therefore whether a one-dimensional beam loaded by a distributed normal drag can reproduce the deflection that a resolved two-dimensional continuum gives, in a confined flow at low Reynolds number. Collapsing the cross-section onto a line discards the resolved pressure and viscous tractions on the beam faces and replaces them with a single drag coefficient, so the reduction can be trusted only once the tip deflection it predicts falls within the spread of the reference solutions.
+Every reference study resolves the cantilever as a two-dimensional continuum, and they differ from one another only in the fluid solver and the interface coupling, as Table~\ref{tab:beamtunnel_refstudies} shows. Here the square cross-section enters the formulation only through its area, its second moment of area, and the drag reference length of Section~\ref{sec:almLineForce}. The benchmark is two-dimensional, and it is solved on a three-dimensional fluid mesh that is one cell thick in the spanwise direction $z$, with symmetry conditions on the two faces normal to $z$, so the flow does not vary across the span. The beam is the same Simo--Reissner model used in the other cases, a one-dimensional centreline carrying a three-dimensional cross-section, so its physical thickness still enters the drag law and the projection. What the benchmark tests is therefore whether a one-dimensional beam loaded by a distributed normal drag can reproduce the deflection that a resolved two-dimensional continuum gives, in a confined flow at low Reynolds number. Collapsing the cross-section onto a line discards the resolved pressure and viscous tractions on the beam faces and replaces them with a single drag coefficient, so the reduction can be trusted only once the tip deflection it predicts falls within the spread of the reference solutions.
 
 \begin{table}[!ht]
 \centering
@@ -48,10 +48,10 @@ A steady parabolic horizontal velocity profile is prescribed at the inlet,
 v_x(y) = -150\,y^2 + 3\,y~~~\mathrm{m\,s^{-1}}, \qquad v_y(y) = 0,
 \label{eq:beamtunnel_inlet}
 \end{equation}
-with $y$ in metres, which is the SI form of the profile $v_x = 1.5(-y^2 + 2y)~\mathrm{cm\,s^{-1}}$ reported in the original paper. It vanishes at the lower wall and attains $U_{\max} = 1.5\times10^{-2}~\mathrm{m\,s^{-1}}$ at the upper symmetry plane. The downstream boundary is a zero-gradient outflow with a fixed reference pressure, the lower boundary a stationary no-slip wall on which the cantilever root is clamped, and the upper boundary a symmetry plane, consistent with the half-domain interpretation of the reference paper in which the mirror across $y = H$ recovers an infinite array of identical cantilevers. The two transverse faces are also symmetry boundaries. Both the fluid and the beam start at rest, with the beam undeformed, and the simulation is advanced with $\Delta t = 10^{-4}~\mathrm{s}$ to $t = 2.5~\mathrm{s}$, by which point the tip velocity has vanished.
+with $y$ in metres, which is the SI form of the profile $v_x = 1.5(-y^2 + 2y)~\mathrm{cm\,s^{-1}}$ reported in the original paper. It vanishes at the lower wall and attains $U_{\max} = 1.5\times10^{-2}~\mathrm{m\,s^{-1}}$ at the upper symmetry plane. The downstream boundary is an outflow with a fixed reference pressure and zero normal gradient of velocity, the lower boundary a stationary no-slip wall on which the cantilever root is clamped, and the upper boundary a symmetry plane, consistent with the half-domain interpretation of the reference paper in which the mirror across $y = H$ recovers an infinite array of identical cantilevers. The front and back faces of the one-cell-thick domain, normal to $z$, are also symmetry planes. Both the fluid and the beam start at rest, with the beam undeformed, and the simulation is advanced with $\Delta t = 10^{-4}~\mathrm{s}$ to $t = 2.5~\mathrm{s}$, by which point the tip velocity has vanished.
 
 \noindent
-Properties are listed in Table~\ref{tab:beamtunnel_properties} and are taken without modification from the reference. The beam follows a linear elastic law with Young's modulus $E$ and Poisson ratio $\nu_s$, from which the shear modulus follows as $G = E/[2(1+\nu_s)]$. The reference uses a Saint-Venant--Kirchhoff hyperelastic continuum, but the cantilever bends as a slender beam rather than stretching, so the strains stay small and the linear law gives an equivalent response in this regime. The flow regime is characterised by a thickness-based Reynolds number $\mathrm{Re}_a = \rho\,U_{\max}\,a/\mu \approx 0.6$, in the viscous-dominated Stokes-like regime, with a height-based value of $15$. Gravity is neglected, consistent with the reference.
+Properties are listed in Table~\ref{tab:beamtunnel_properties} and are taken without modification from the reference. The beam resultants are linear in the strain measures of Section~\ref{sec:beamSection}, with Young's modulus $E$ and Poisson ratio $\nu_s$, from which the shear modulus follows as $G = E/[2(1+\nu_s)]$. The flow regime is characterised by a thickness-based Reynolds number $\mathrm{Re}_a = \rho\,U_{\max}\,a/\mu \approx 0.6$, in the viscous-dominated Stokes-like regime, with a height-based value of $15$. Gravity is neglected, consistent with the reference.
 
 \begin{table}[!ht]
 \centering
@@ -90,7 +90,7 @@ Poisson ratio                    & $\nu_s$    & $0.3$ \\
 The normal drag coefficient in Eq.~\eqref{eq:almLineForce} has to be fixed before the coupled result can be discussed. Because the formulation reduces the cross-section to a centreline, the near-field tractions on it are not resolved and are absorbed instead into a single coefficient multiplying the upstream-sampled velocity squared, so that coefficient has to reflect the drag on a rigid cross-section of the same geometry in the same confined channel.
 
 \noindent
-A separate steady incompressible CFD simulation was run on the same channel domain, with the flexible cantilever replaced by an undeformed rigid plate of the same square cross-section clamped at the same root location. The geometry, boundary conditions, and fluid properties are identical to the coupled case. It is solved with \texttt{simpleFoam} on a uniform $150 \times 38$ background hexahedral mesh with one level of local refinement around the plate (Figure~\ref{fig:beamInTunnel_dragcalib_mesh}), which captures the upstream stagnation point, the accelerated jet between the plate tip and the upper symmetry boundary, and the leeward recirculation. The reference area is $A_{\mathrm{ref}} = a b = 3.2\times10^{-6}~\mathrm{m^2}$, so the reported coefficient corresponds directly to the normal drag coefficient of the closure. The plate is held straight while the coupled beam bends downstream and blocks less of the channel, which matters less than it appears, because the actuator line multiplies $C_{dn}$ by the velocity sampled in the deformed configuration, and that velocity already reflects the wider gap above the deflected tip.
+A separate steady incompressible CFD simulation was run on the same channel domain, with the flexible cantilever replaced by an undeformed rigid plate of the same square cross-section clamped at the same root location. The geometry, boundary conditions, and fluid properties are identical to the coupled case. It is solved as a steady flow with the SIMPLE algorithm \citep{patankar_calculation_1972}, as implemented in the \texttt{simpleFoam} solver of OpenFOAM, on a uniform $150 \times 38$ background hexahedral mesh with one level of local refinement around the plate (Figure~\ref{fig:beamInTunnel_dragcalib_mesh}), which captures the upstream stagnation point, the accelerated jet between the plate tip and the upper symmetry boundary, and the leeward recirculation. The reference area is $A_{\mathrm{ref}} = a b = 3.2\times10^{-6}~\mathrm{m^2}$, so the reported coefficient corresponds directly to the normal drag coefficient of the closure. The plate is held straight while the coupled beam bends downstream and blocks less of the channel, which matters less than it appears, because the actuator line multiplies $C_{dn}$ by the velocity sampled in the deformed configuration, and that velocity already reflects the wider gap above the deflected tip.
 
 \begin{figure}[!ht]
 \centering
@@ -120,18 +120,18 @@ This calibration is a one-time, geometry-specific step rather than a free parame
 \label{sec:beamtunnel_verification}
 
 \noindent
-With $C_{dn}$ fixed, the coupled simulation is run to steady state. Figure~\ref{fig:beamInTunnel_verification} compares the predicted steady tip horizontal displacement against the range reported in the literature. The shaded reference range spans $4.7$ to $6.0~\mathrm{mm}$ and brackets the steady tip displacements digitised from the published curves of \citet{zhang_immersed_2012}, \citet{long_coupling_esfem_sph_2021}, and \citet{yan_explicit_velocity_iblbm_2023}. Two further references, \citet{yang_peridynamics_iblbm_2022} and \citet{wang_immersed_esfem_2022}, report values below this band; they are noted for completeness but excluded from it, being outliers relative to the original result and the more recent values from other methods.
+With $C_{dn}$ fixed, the coupled simulation is run to steady state. Figure~\ref{fig:beamInTunnel_verification} compares the predicted steady tip horizontal displacement against the values reported in the literature. The shaded band spans $4.7$ to $6.0~\mathrm{mm}$ and brackets the steady tip displacements digitised from the published curves of \citet{zhang_immersed_2012}, \citet{long_coupling_esfem_sph_2021}, and \citet{yan_explicit_velocity_iblbm_2023}. The other two studies of Table~\ref{tab:beamtunnel_refstudies}, \citet{yang_peridynamics_iblbm_2022} and \citet{wang_immersed_esfem_2022}, report lower steady displacements, below $4.7~\mathrm{mm}$, so the five published solutions together span a wider range that extends below the band.
 
 \begin{figure}[!ht]
 \centering
 \includegraphics[width=0.90\textwidth]{verificationLegend.pdf}\\[0.4em]
 \includegraphics[width=0.68\textwidth]{verification.pdf}
-\caption{Steady tip horizontal displacement of the flexible cantilever in the channel benchmark. The blue dash-dotted curve is the present result; the grey band spans the range $4.7$ to $6.0~\mathrm{mm}$ covered by the three closely clustered reference studies \citep{zhang_immersed_2012,long_coupling_esfem_sph_2021,yan_explicit_velocity_iblbm_2023}. The two outlier references \citep{yang_peridynamics_iblbm_2022,wang_immersed_esfem_2022} lie below the band and are listed in the legend for completeness.}
+\caption{Steady tip horizontal displacement of the flexible cantilever in the channel benchmark. The blue dash-dotted curve is the present result; the grey band spans the range $4.7$ to $6.0~\mathrm{mm}$ covered by three of the reference studies \citep{zhang_immersed_2012,long_coupling_esfem_sph_2021,yan_explicit_velocity_iblbm_2023}. The other two reference studies \citep{yang_peridynamics_iblbm_2022,wang_immersed_esfem_2022} report lower values, below the band.}
 \label{fig:beamInTunnel_verification}
 \end{figure}
 
 \noindent
-The present transient reaches a stationary plateau at approximately $t = 1.4~\mathrm{s}$, and the converged tip displacement is $5.73~\mathrm{mm}$, inside the reference band. The two are not expected to converge to the same answer under mesh refinement, because the reference methods resolve the solid and the tractions on its faces while the present formulation replaces them with a drag law on a line, so the underlying mathematical models differ. Nor is there a single agreed value within the family of two-dimensional continuum methods, the width of the band and the spread of the outliers reflecting sensitivities to the structural discretisation, the smoothing kernel adopted in the immersed coupling, and the treatment of the singular pressure field at the sharp upstream corners of the beam.
+The present transient reaches a stationary plateau at approximately $t = 1.4~\mathrm{s}$, and the converged tip displacement is $5.73~\mathrm{mm}$, inside the band and therefore also within the range of all five studies. The present result and the reference solutions are not expected to converge to the same value under mesh refinement, because the reference methods resolve the solid and the tractions on its faces while the present formulation replaces them with a drag law on a line, so the underlying mathematical models differ. Nor is there a single agreed value within the family of two-dimensional continuum methods, the spread across the five studies reflecting sensitivities to the structural discretisation, the smoothing kernel adopted in the immersed coupling, and the treatment of the singular pressure field at the sharp upstream corners of the beam.
 
 \noindent
 Figure~\ref{fig:beamInTunnel_snapshots} shows the flow field early in the transient and at the steady asymptote. At $t = 0.3~\mathrm{s}$ the tip has swung downstream by roughly half of its final displacement and the streamlines bend smoothly around the bent cantilever, with no closed recirculation cell yet in the leeward region. The cell emerges between $t = 0.3$ and $0.6~\mathrm{s}$ together with an accelerated jet above the tip, and by $t = 1.5~\mathrm{s}$ the field is indistinguishable from its steady asymptote, the jet reaching $2.9\times 10^{-2}~\mathrm{m\,s^{-1}}$, almost twice the inlet peak velocity.
@@ -172,25 +172,22 @@ The time step is varied over a factor of $500$, from $2\times10^{-2}$ down to $4
 
 \begin{figure}[!ht]
 \centering
-\begin{subfigure}[b]{0.32\textwidth}
+\begin{subfigure}[t]{0.32\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{mesh_study.pdf}
+  \includegraphics[width=\linewidth]{mesh_study_paper.pdf}
   \caption{fluid mesh}
 \end{subfigure}\hfill
-\begin{subfigure}[b]{0.32\textwidth}
+\begin{subfigure}[t]{0.32\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{bms_study.pdf}
+  \includegraphics[width=\linewidth]{bms_study_paper.pdf}
   \caption{beam mesh}
 \end{subfigure}\hfill
-\begin{subfigure}[b]{0.32\textwidth}
+\begin{subfigure}[t]{0.32\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{dt_study.pdf}
+  \includegraphics[width=\linewidth]{dt_study_paper.pdf}
   \caption{time step}
-\end{subfigure}\\[0.6em]
-\includegraphics[width=\textwidth]{mesh_studyLegend.pdf}\\[0.2em]
-\includegraphics[width=\textwidth]{bms_studyLegend.pdf}\\[0.2em]
-\includegraphics[width=\textwidth]{dt_studyLegend.pdf}
-\caption{Discretisation studies for the flexible-beam-in-channel problem, showing the transient tip horizontal displacement for (a) five successively refined fluid meshes, (b) four beam discretisations spanning $N_b = 20$ to $160$ cells, and (c) time steps spanning a factor of $500$. Legends for the three studies are stacked below the panels in the same order. Within each study the converged traces are visually indistinguishable in the steady regime.}
+\end{subfigure}
+\caption{Discretisation studies for the flexible-beam-in-channel problem, showing the transient tip horizontal displacement for (a) five successively refined fluid meshes, (b) four beam discretisations spanning $N_b = 20$ to $160$ cells, and (c) time steps spanning a factor of $500$. Each panel carries its own legend beneath its axes. Within each study the converged traces are visually indistinguishable in the steady regime.}
 \label{fig:beamInTunnel_discretisation}
 \end{figure}
 
@@ -198,26 +195,24 @@ The time step is varied over a factor of $500$, from $2\times10^{-2}$ down to $4
 Figure~\ref{fig:beamInTunnel_operator}(a) examines the sensitivity to the Gaussian kernel width of Eq.~\eqref{eq:almGaussian}. Following the dual normalisation of \citet{bral_actuator_2025}, each value is expressed both as a multiple of the base-mesh cell size $\Delta x = 2.67\times10^{-4}~\mathrm{m}$ and of the cross-section side $a$. Because the projection is normalised so that the total force on the fluid is independent of the kernel width (Section~\ref{sec:almProjection}), what is measured here is only the indirect effect of the kernel on the surrounding velocity field, which modifies the upstream-sampled velocity.
 
 \noindent
-Within the admissible range $1.12\,\Delta x \le \varepsilon \le 3.75\,\Delta x$, equivalently $0.75\,a$ to $2.5\,a$, the steady tip displacement varies monotonically from $5.09$ to $6.26~\mathrm{mm}$, a spread of approximately $20\%$ (Table~\ref{tab:beamtunnel_operator_cases}). Smaller $\varepsilon$ concentrates the reaction closer to the centreline, producing a more localised wake and a lower sampled velocity, hence smaller drag and smaller deflection, while larger $\varepsilon$ spreads the reaction into the freestream and raises the sampled velocity. The baseline $\varepsilon = 2.25\,\Delta x = 1.5\,a$ sits above the minimum required for a resolved projection and clear of the upper boundary. The outlier at $5.62\,\Delta x$ is a kernel so wide that its tail overlaps the upper symmetry boundary, and the nodal normalisation then redistributes the truncated mass along the whole node support instead of preserving the local profile, so the momentum injected near the beam drops and its displacement of $5.53~\mathrm{mm}$ falls back below the monotonic trend. The increasing relation between $\varepsilon$ and tip displacement holds only while the kernel stays clear of the walls.
+Within the admissible range $1.12\,\Delta x \le \varepsilon \le 3.75\,\Delta x$, equivalently $0.75\,a$ to $2.5\,a$, the steady tip displacement varies monotonically from $5.09$ to $6.26~\mathrm{mm}$, a spread of approximately $20\%$ (Table~\ref{tab:beamtunnel_operator_cases}). Smaller $\varepsilon$ concentrates the reaction closer to the centreline, producing a more localised wake and a lower sampled velocity, hence smaller drag and smaller deflection, while larger $\varepsilon$ spreads the reaction into the freestream and raises the sampled velocity. The baseline $\varepsilon = 2.25\,\Delta x = 1.5\,a$ sits above the minimum required for a resolved projection and clear of the upper boundary. The case at $5.62\,\Delta x$ lies outside this range, because its kernel is so wide that its tail reaches the upper symmetry boundary. The nodal normalisation then redistributes the truncated mass along the whole node support instead of preserving the local profile, so the momentum injected near the beam drops and its displacement of $5.53~\mathrm{mm}$ falls back below the monotonic trend. The increasing relation between $\varepsilon$ and tip displacement holds only while the kernel stays clear of the domain boundaries.
 
 \paragraph{Upstream sampling distance.}
 Figure~\ref{fig:beamInTunnel_operator}(b) reports the sensitivity to the offset $r_s$. In an unbounded flow this offset is chosen large enough to sample the undisturbed freestream rather than the stagnation-affected velocity adjacent to the beam, but in a confined channel it must also remain inside the domain and below the upper symmetry plane. Over the admissible range the steady displacement varies monotonically from $4.44~\mathrm{mm}$ at $r_s = 0.53~\mathrm{mm}$ to $6.20~\mathrm{mm}$ at $4.77~\mathrm{mm}$, a spread of approximately $31\%$. The smallest offset samples within the beam's own stagnation zone and the largest samples the accelerated jet between the deflected beam and the upper boundary. The case $r_s = 6.36~\mathrm{mm}$ pushes the sampling point upstream of the inlet for the lower part of the beam and lies outside the admissible range.
 
 \begin{figure}[!ht]
 \centering
-\begin{subfigure}[b]{0.48\textwidth}
+\begin{subfigure}[t]{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{eps_study.pdf}
+  \includegraphics[width=\linewidth]{eps_study_paper.pdf}
   \caption{kernel width $\varepsilon$}
 \end{subfigure}\hfill
-\begin{subfigure}[b]{0.48\textwidth}
+\begin{subfigure}[t]{0.48\textwidth}
   \centering
-  \includegraphics[width=\linewidth]{sampling_study.pdf}
+  \includegraphics[width=\linewidth]{sampling_study_paper.pdf}
   \caption{sampling offset $r_s$}
-\end{subfigure}\\[0.6em]
-\includegraphics[width=\textwidth]{eps_studyLegend.pdf}\\[0.2em]
-\includegraphics[width=\textwidth]{sampling_studyLegend.pdf}
-\caption{Sensitivity of the steady tip displacement to the two coupling-operator settings. (a) Gaussian kernel width, each case labelled both in units of the base-mesh cell size $\Delta x = 2.67\times10^{-4}~\mathrm{m}$ and the cross-section side $a$; the case $\varepsilon = 5.62\,\Delta x$ overlaps the upper symmetry boundary and is excluded. (b) Upstream sampling offset; the smallest sample lies in the stagnation zone and the largest beyond the inlet, both shown in grey. Legends for the two studies are stacked below the panels in the same order, and the individual values are listed in Table~\ref{tab:beamtunnel_operator_cases}. Unlike the discretisation studies of Figure~\ref{fig:beamInTunnel_discretisation}, both parameters change the response by tens of percent.}
+\end{subfigure}
+\caption{Sensitivity of the steady tip displacement to the two coupling-operator settings, with each panel carrying its own legend. (a) Gaussian kernel width, each case labelled both in units of the base-mesh cell size $\Delta x = 2.67\times10^{-4}~\mathrm{m}$ and the cross-section side $a$. The case $\varepsilon = 5.62\,\Delta x$, shown in grey, reaches the upper symmetry boundary and lies outside the admissible range. (b) Upstream sampling offset. The smallest offset samples inside the stagnation zone, and the offset of $6.36~\mathrm{mm}$, shown in grey, places the sampling point upstream of the inlet for the lower part of the beam. The individual values are listed in Table~\ref{tab:beamtunnel_operator_cases}. Unlike the discretisation studies of Figure~\ref{fig:beamInTunnel_discretisation}, both parameters change the response by tens of percent.}
 \label{fig:beamInTunnel_operator}
 \end{figure}
 
@@ -226,7 +221,7 @@ Figure~\ref{fig:beamInTunnel_operator}(b) reports the sensitivity to the offset 
 \small
 \caption{Kernel-width and sampling-distance studies. Steady tip displacement for each Gaussian regularisation width $\varepsilon$, listed as a multiple of the base-mesh cell size $\Delta x = 2.67\times10^{-4}~\mathrm{m}$ and of the cross-section side $a = 4\times10^{-4}~\mathrm{m}$, and for each upstream sampling offset $r_s$.}
 \label{tab:beamtunnel_operator_cases}
-\setlength{\tabcolsep}{6pt}
+\setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.15}
 \begin{tabular}{c c c c l @{\qquad} c c l}
 \toprule
@@ -237,7 +232,7 @@ $3.0\times10^{-4}$ & $1.12$ & $0.75$ & $5.09$ & lower bound        & $0.53$ & $4
 $4.0\times10^{-4}$ & $1.50$ & $1.00$ & $5.30$ &                    & $1.59$ & $5.03$ & \\
 $6.0\times10^{-4}$ & $2.25$ & $1.50$ & $5.73$ & baseline           & $3.18$ & $5.73$ & baseline \\
 $1.0\times10^{-3}$ & $3.75$ & $2.50$ & $6.26$ & upper bound        & $3.71$ & $5.90$ & \\
-$1.5\times10^{-3}$ & $5.62$ & $3.75$ & $5.53$ & overlaps top wall  & $4.77$ & $6.20$ & upper bound \\
+$1.5\times10^{-3}$ & $5.62$ & $3.75$ & $5.53$ & reaches top boundary & $4.77$ & $6.20$ & upper bound \\
                    &        &        &        &                    & $6.36$ & $6.50$ & upstream of inlet \\
 \bottomrule
 \end{tabular}
@@ -247,12 +242,12 @@ $1.5\times10^{-3}$ & $5.62$ & $3.75$ & $5.53$ & overlaps top wall  & $4.77$ & $6
 The baseline $r_s = 3.18~\mathrm{mm}$ lands in the middle of the admissible range and yields, together with the kernel-width baseline, the result closest to the literature range. Both settings therefore act as effective calibration parameters rather than discretisation-only convergence controls, and in this confined channel they calibrate the quasi-steady closure to the local blockage. Only $C_{dn}$ was fixed independently of the reference, whereas the pair $(\varepsilon, r_s)$ was selected within its admissible plateau with the reference result in view, so the agreement is an assessment against other numerical solutions with two calibrated operator settings rather than a fully blind prediction. The selected pair is carried \emph{unchanged} into the benchmark of Section~\ref{sec:leaflet}, and the wave-flume case of Section~\ref{sec:flexveg} sizes the kernel by the same rule relative to the local cell size, so what those later cases test is the transferred settings rather than the settings themselves.
 
 \paragraph{Solver tolerance hierarchy.}
-The remaining numerical artefact is the iterative tolerance of the structural Newton solver and the PIMPLE outer loop. Table~\ref{tab:beamtunnel_tol_cases} reports three successively tightened configurations. The loose-structural configuration over-predicts the steady displacement by $3.3\%$ and drifts slowly away from a transient overshoot, which is the characteristic signature of a partitioned coupling whose structural side has not converged within each time step. Tightening the Newton tolerance alone reduces both the overshoot and the drift to under $1\%$ at negligible cost, because the structural solve is cheap relative to the fluid solve, so the dominant iterative error is on the structural side. Increasing the PIMPLE outer-iteration count from one to twenty on top brings the plateau within $0.1\%$ of its asymptotic value, at roughly five to ten times the per-step fluid cost, and that third configuration is used for Figure~\ref{fig:beamInTunnel_verification} and for all the studies above. The last step also bounds the error introduced by freezing the interface force for the duration of the time step (Section~\ref{sec:almParallelSearch}), because driving the pressure--velocity system to convergence against that frozen force changes the answer by $0.1\%$.
+The remaining numerical artefact is the iterative tolerance of the structural Newton solver and the PIMPLE outer loop. Table~\ref{tab:beamtunnel_tol_cases} reports three successively tightened configurations. The loose-structural configuration over-predicts the steady displacement by $3.3\%$ and drifts slowly away from a transient overshoot, which is the characteristic signature of a partitioned coupling whose structural side has not converged within each time step. Tightening the Newton tolerance alone reduces both the overshoot and the drift to under $1\%$ at negligible cost, because the structural solve is cheap relative to the fluid solve, so the dominant iterative error is on the structural side. The third configuration keeps the tight Newton tolerance and allows up to twenty PIMPLE outer iterations per time step instead of one. The outer loop stops earlier once the initial residuals of the velocity and pressure equations fall below $10^{-7}$, or below $10^{-4}$ of their values at the first outer iteration of the step. This brings the plateau within $0.1\%$ of its asymptotic value, at roughly five to ten times the per-step fluid cost, and the third configuration is used for Figure~\ref{fig:beamInTunnel_verification} and for all the studies above. The last step also bounds the error introduced by freezing the interface force for the duration of the time step (Section~\ref{sec:almParallelSearch}), because driving the pressure--velocity system to convergence against that frozen force changes the answer by $0.1\%$.
 
 \begin{table}[!ht]
 \centering
 \small
-\caption{Solver-tolerance hierarchy. The structural Newton tolerance and the number of PIMPLE outer iterations $n_{\mathrm{out}}$ are tightened in turn. The last configuration is adopted for the verification figure and all sensitivity studies.}
+\caption{Solver-tolerance hierarchy. The structural Newton tolerance and the maximum number of PIMPLE outer iterations $n_{\mathrm{out}}$ are tightened in turn. The last configuration is adopted for the verification figure and all sensitivity studies.}
 \label{tab:beamtunnel_tol_cases}
 \setlength{\tabcolsep}{5pt}
 \renewcommand{\arraystretch}{1.15}
@@ -268,4 +263,4 @@ Tight structural + PIMPLE & $10^{-9}$ & $20$ & $5.73$ & reference (within $0.1\%
 \end{table}
 
 \noindent
-Taken together, the six studies confirm that the steady tip displacement of $5.73~\mathrm{mm}$ is converged in the discretisation sense, and it stays inside the literature band of $4.7$ to $6.0~\mathrm{mm}$. The coupling is therefore verified against reference solutions obtained with other methods for steady, viscous-dominated flow in a confined channel, which is a check against other numerical solutions rather than a validation against physical measurements, and it motivates moving to the time-periodic benchmark of the next section.
+Taken together, the six studies separate two kinds of sensitivity. The fluid mesh, the beam mesh, the time step, and the solver tolerances have small effects that can be controlled, so the steady tip displacement of $5.73~\mathrm{mm}$ is converged in the discretisation sense, and it stays inside the literature band of $4.7$ to $6.0~\mathrm{mm}$. The two coupling-operator settings are the dominant sensitivities of the method in this benchmark. Across their admissible ranges the kernel width changes the tip displacement by about $20\%$ and the sampling offset by about $31\%$. The dependence on the sampling offset is a property of the closure rather than a discretisation error, since the offset selects the velocity that drives the drag law, so it does not diminish under mesh refinement or tighter tolerances. The kernel is sized relative to the local cell size in practice, so part of its influence behaves like a discretisation effect, but whether it vanishes when the kernel and the mesh are refined together was not tested here. A confined channel in which the beam spans most of the cross-section is also the least favourable case for both parameters, because the velocity upstream of the beam varies strongly with position, from the stagnation region near the root to the accelerated jet above the tip. The coupling is therefore verified against reference solutions obtained with other methods for steady, viscous-dominated flow in a confined channel, which is a check against other numerical solutions rather than a validation against physical measurements, and it motivates moving to the time-periodic benchmark of the next section.
