@@ -95,7 +95,7 @@ beams
 
     // Coefficient of drag in normal and tangential directions
     // Default value if not specified is 1.0 for both
-    Cdn 26;
+    Cdn 26.73;
     Cdt 0.01;
     CMn 0;
     CMt 0;

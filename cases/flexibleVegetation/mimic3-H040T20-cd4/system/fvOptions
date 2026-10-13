@@ -23,8 +23,8 @@ flexibleStem
     {
         U               U;
 
-        // Gaussian kernel width (~ 2.5 * dx, dx = 0.024)
-        epsilon         0.06;
+        // Gaussian kernel width (= 2.5 * dx, dx = 0.006)
+        epsilon         0.015;
 
         // Beam region name (as defined in dynamicMeshDict)
         beamName        beam_0;

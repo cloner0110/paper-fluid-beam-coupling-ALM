@@ -29,7 +29,7 @@ stopAt          endTime;
 
 endTime         4;
 
-deltaT          1e-04;
+deltaT          5e-05;
 
 writeControl    adjustable;
 
