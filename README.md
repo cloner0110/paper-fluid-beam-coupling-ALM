@@ -3,3 +3,11 @@
 Manuscript source for the actuator-line (ALM) beam–fluid coupling paper, ported from
 Chapters 3, 4 and 5 of the PhD thesis (`~/gate/PhD_thesis_UCD`) into the LaTeX template of
 <https://github.com/philipcardiff/paper-monolithic-fsi>.
+
+## Repository layout
+
+- `paper/`: manuscript source (`article.tex`, `sections/`, `figures/`, `bibliography.bib`,
+  class and bibliography style). Build from inside `paper/` with
+  `pdflatex article; bibtex article; pdflatex article; pdflatex article`.
+- `cases/`: OpenFOAM set-ups of the coupled test cases reported in the paper (beam in a
+  confined channel, oscillating leaflet, flexible vegetation stem). See `cases/README.md`.
