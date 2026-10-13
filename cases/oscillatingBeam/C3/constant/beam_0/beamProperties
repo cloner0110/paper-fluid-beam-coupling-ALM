@@ -1,0 +1,105 @@
+/*--------------------------------*- C++ -*----------------------------------* \
+| =========                 |                                                 |
+| \\      /  F ield         | foam-extend: Open Source CFD                    |
+|  \\    /   O peration     | Version:     4.0                                |
+|   \\  /    A nd           | Web:         http://www.foam-extend.org         |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      beamProperties;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+beamModel coupledTotalLagNewtonRaphsonBeam;
+
+// nBeams 1;
+
+// R R [0 1 0 0 0 0 0] 0.000106;//3.17E-04;
+// L L [0 1 0 0 0 0 0] 0.008;//0.005;
+// nSegments 80;
+
+beams
+(
+    beam_0
+    {
+        crossSectionModel rectangle;
+
+        // circleCrossSectionModelDict
+        // {
+        //     radius 0.000106;
+        // }
+
+        // length 0.008;
+        // nSegments 80;
+        rectangleCrossSectionModelDict
+        {
+            b 0.000212;
+            h 0.000212;
+            nx 1;
+            ny 1;
+            // scalingSecondMomentArea 0.4;
+        }         
+        length 0.008;
+        nSegments 80;
+    }
+);
+
+"coupledTotalLagNewtonRaphsonBeamCoeffs"
+{
+    E E [1 -1 -2 0 0 0 0] 1E06;
+    G G [1 -1 -2 0 0 0 0] 3.3333E05;
+    rho rho [1 -3 0 0 0 0 0] 6000;
+    rhoFluid rhoFluid [1 -3 0 0 0 0 0] 1000;
+    //- convergence check paramters----------------
+    nCorrectors 500;
+    residualTol 1e-09;
+    solutionTol 1e-10;
+    absoluteTol 1e-10;
+    convergenceTol 1e-07;//1e-06;
+    divergenceTol  1e6;
+
+    //- ALM related parameters
+    // ALM-style fluid velocity sampling and line-force coupling
+    almSamplingActive true;
+
+    // Optional: relaxation for the ALM line force.
+    // Default if not specified: 1.0
+    forceRelaxation 1;
+
+    // Optional: sampling distance multiplier.
+    // Actual offset = samplingRadius*almSamplingReferenceLength.
+    // Default if not specified: 5.0
+    samplingRadius 30;
+
+    // Required when almSamplingActive is true.
+    // Normal to the plane that sampling points are projected back onto.
+    // (0 0 1) keeps Ps.z() equal to beamCoords.z(); use (0 1 0) for y-depth cases.
+    almSamplingPlaneNormal (0 0 1);
+    almUpstreamDir      (-1 0 0);
+
+    // Optional: base length used for upstream sampling distance.
+    // Default if not specified: R()
+    // For rectangle b=h=0.000212, use h/2 = 0.000106.
+    almSamplingReferenceLength 0.000106;
+
+    // Optional: projected length used in drag force calculation.
+    // Default if not specified: 2*R()
+    // For rectangle b=h=0.000212, use full projected width.
+    almDragReferenceLength 0.000212;
+
+    // Coefficient of drag in normal and tangential directions
+    // Default value if not specified is 1.0 for both
+    Cdn 90;
+    Cdt 0.01;
+    CMn 0;
+    CMt 0;
+}
+
+
+
+// ************************************************************************* //
